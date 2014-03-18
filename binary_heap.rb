@@ -39,10 +39,8 @@ module HeapFunctions
     end 
   end
 
-  def get_max op
-    container.shift
-    bt_heapify op
-    puts "container #{container}"
+  def get_root
+    container.first
   end
 
   def inorder_traversal i
@@ -53,10 +51,11 @@ module HeapFunctions
 
   def insert(value, op)
     container << value
-    top_down_heapify container, 0, op
+    bt_heapify op
     degree = Math.log2(container.size).to_i + 1
   end
 
+  # Heap usually support delete-root method, but not arbitary element deletion.
   def deletion(op)
     container[0], container[-1] = container.last, container.first
     min = container.pop
@@ -91,17 +90,7 @@ class MinHeap
     super "<"
   end
 
-  def get_max 
-    super "<"
-  end
 end 
-
-min_h = MinHeap.new container
-min_h.insert 100
-min_h.insert 0
-min_h.deletion
-#min_h.inorder_traversal 0
-min_h.get_max
 
 class MaxHeap
   include HeapFunctions
@@ -126,8 +115,4 @@ end
 #max_h = MaxHeap.new container
 #max_h.insert 100
 #max_h.insert 0
-#max_h.deletion
-
-class BinomialHeap 
-
-end
+#max_h.deletionp

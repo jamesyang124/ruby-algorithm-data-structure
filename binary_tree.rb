@@ -24,7 +24,7 @@
 # Target: Binary search thread tree.
 class Node
   attr_accessor :left_node, :right_node, :value, :left_td, :right_td
-  
+
   def initialize(*values)
     self.value = values[0]
     self.left_node = Node.new(values[1]) if values[1]
