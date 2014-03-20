@@ -1,24 +1,3 @@
-# Copyright (c) 2014 James Yang
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-
 # Binomial tree properties:
 # 1. N nodes binomial heap at most lg(n) + 1 binomial tree
 # 2. each key is the larger or greater than its parent => each root has smallest key in that tree
@@ -68,7 +47,7 @@ class BinomialHeap
 
   # N nodes binomial heap at most lg(n) + 1 binomial tree
   # 13 = 1101(binary representation) => 3 trees.
-  # at most lg n + 1 => O(lg(n))
+  # at most lg n + 1 => O(lg(n)) to get or extract min
   def get_min
     if next_head = self.head.sibling
       current_head = self.head
@@ -143,7 +122,11 @@ class BinomialHeap
         puts "\t Child: #{node_child.key}, degree: #{node_child.degree}"
         node_child_sib = node_child.sibling
         while node_child_sib
-          puts "\t\t Sibling: #{node_child_sib.key}, degree: #{node_child_sib.degree}, parent: #{node_child_sib.parent.key}"
+          puts <<-HERE 
+            \t Sibling: #{node_child_sib.key}
+            \t\t degree: #{node_child_sib.degree}
+            \t\t parent: #{node_child_sib.parent.key}
+          HERE
           node_child_sib = node_child_sib.sibling
         end
         node_child = node_child.child
@@ -154,6 +137,10 @@ class BinomialHeap
   end
 
 private
+
+  def decrease_key
+    
+  end
 
   # return new head for 2 merge heaps
   def merge_root_list heap_x, heap_y
@@ -223,7 +210,3 @@ private
     node_y.degree += 1
   end
 end
-
-#@size = 13.to_s(2).split(//).map do |s|
-#      s.to_i
-#end.reverse!

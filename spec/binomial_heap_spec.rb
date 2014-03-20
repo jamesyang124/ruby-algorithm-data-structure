@@ -16,6 +16,7 @@ describe "BinomialHeap" do
   end
 
   it "extract min" do
+    @x.print_siblings
     expect(@x.min.key).to equal 0
     expect(@x.extract_min).to equal 0
   end
