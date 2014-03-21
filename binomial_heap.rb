@@ -5,6 +5,7 @@
 # 3. For any non-negative integer K, there has at most 1 binomial tree's root degree is K.
 # 4. Each tree's node count must be 2^i, i >= 0, i is that tree's degree
 
+# implementation support non-negative key only.
 class BinomialNode 
   # :next as sibling tree, :key as value
   attr_accessor :degree, :sibling, :child, :parent, :key
@@ -26,6 +27,21 @@ class BinomialHeap
   # self.head === @head for instance object.
   # "self.head=" expression call object's "head=" method so must declare :head to attr_writer
   # if we have "self.head = something" expression.
+  # If local var has same name as instance var, 
+  #   then must explictily call that instance var rather than by reader method in that scope.
+  # ex: attr_accessor :x 
+  #  def get_x                               
+  #   @x = 50                                
+  #   x = 60                                 
+  #   p x == @x  # => f, x is local var.     
+  #  end
+  # 
+  # def get_x                                     
+  #  @x = 50
+  #  p x == @x  # => t, x is call by reader method in default. 
+  #  # above x call self object to find reader method, or it will treat it as a undefined local variable. 
+  # end  
+
   def initialize key
     if key.class != BinomialNode
       @head = BinomialNode.new key 
@@ -42,13 +58,13 @@ class BinomialHeap
   end
 
   def min
-    get_min
+    peek_min
   end
 
   # N nodes binomial heap at most lg(n) + 1 binomial tree
   # 13 = 1101(binary representation) => 3 trees.
   # at most lg n + 1 => O(lg(n)) to get or extract min
-  def get_min
+  def peek_min
     if next_head = self.head.sibling
       current_head = self.head
       while next_head 
@@ -63,13 +79,16 @@ class BinomialHeap
   end
 
   # decrease a key than delete a node.
-  def delete_key
-    
+  def delete_key key
+    # decrease that key to new minimum, and extract it out.
+    decrease_key key, min.key - 1
+    extract_min
+    print_heap
   end
 
   # delete min node in root of binomial tree.
   def extract_min
-    extract_key = get_min.key
+    extract_key = peek_min.key
 
     # create a new heap's root list from the min tree.
     # Also reverse the order of min-tree's children to match the strictly increased order.
@@ -91,7 +110,7 @@ class BinomialHeap
     # remove @min from current heap
     root = self.head 
     if root == @min
-      self.head = @min.sibling
+      @head = @min.sibling
     else
       prev = nil 
       while root
@@ -105,7 +124,7 @@ class BinomialHeap
     end
 
     # Union
-    head = merge_root_list(self, BinomialHeap.new(min_head))
+    @head = merge_root_list(self, BinomialHeap.new(min_head))
     h_next = head.sibling
     merge(head, h_next)
     # get new @min
@@ -113,19 +132,37 @@ class BinomialHeap
     extract_key
   end
 
-  def print_siblings
+  def decrease_key(key, new_key = nil)
+    if node = search_key(key)
+      if new_key && node.key < new_key 
+        puts "the new key is greater than the old one, cause error."
+      else
+        new_key ? node.key = new_key : node.key = get_new_smallest_key(key)
+        swap_parent = find_and_swap_parent node
+        if swap_parent
+          puts "new key is #{swap_parent.key}, swap with #{node.key}"
+        else
+          puts "new key is #{node.key}, no swap happened."
+        end
+        #print_heap
+      end
+      node
+    else
+      puts "Cannot find that key in heap."
+    end
+  end
+
+  def print_heap
     node = self.head
     while node
       puts "head: #{node.key}, degree: #{node.degree}"
       node_child = node.child
       while node_child
-        puts "\t Child: #{node_child.key}, degree: #{node_child.degree}"
+        puts "\t Child: #{print_helper node_child}"
         node_child_sib = node_child.sibling
         while node_child_sib
           puts <<-HERE 
-            \t Sibling: #{node_child_sib.key}
-            \t\t degree: #{node_child_sib.degree}
-            \t\t parent: #{node_child_sib.parent.key}
+            \t Sibling: #{print_helper node_child_sib}
           HERE
           node_child_sib = node_child_sib.sibling
         end
@@ -138,12 +175,58 @@ class BinomialHeap
 
 private
 
-  def decrease_key
+  def print_helper node
+    "#{node.key}, degree: #{node.degree}, parent: #{node.parent.key}, child: #{node.child ? node.child.key : "none" }"
+  end
+
+  def get_new_smallest_key key
+    if key == 0
+      gen_key = -(Random.new.rand(key + 2).to_i)
+    else
+      gen_key = Random.new.rand(key).to_i
+      # generate unique key which not exist in heap.
+      while (search_key gen_key) != nil
+        gen_key = Random.new.rand(key).to_i 
+      end
+    end
+    gen_key
+  end
+
+  def find_and_swap_parent node
+    current = node
+    p = node.parent
+    while p && current.key < p.key      
+      p.key, current.key = current.key, p.key
+      current = p
+      p = p.parent
+    end
+    current
+  end
+
+  def search_key key
+    node = self.head
     
+    while node
+      return node if node.key == key
+      node_child = node.child    
+      while node_child
+        return node_child if node_child.key == key
+        node_child_sib = node_child.sibling
+        while node_child_sib 
+          return node_child_sib if node_child_sib.key == key
+          node_child_sib = node_child_sib.sibling
+        end
+        node_child = node_child.child
+      end
+      node = node.sibling
+    end
   end
 
   # return new head for 2 merge heaps
   def merge_root_list heap_x, heap_y
+    return heap_y.head if !heap_x.head
+    return heap_x.head if !heap_y.head
+
     hx_next, hy_next = heap_x.head, heap_y.head
 
     # initialization for head and tail of new root list
