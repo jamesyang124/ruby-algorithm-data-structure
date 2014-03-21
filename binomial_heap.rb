@@ -5,7 +5,7 @@
 # 3. For any non-negative integer K, there has at most 1 binomial tree's root degree is K.
 # 4. Each tree's node count must be 2^i, i >= 0, i is that tree's degree
 
-# implementation support non-negative key only.
+# Implementation now support negative key.
 class BinomialNode 
   # :next as sibling tree, :key as value
   attr_accessor :degree, :sibling, :child, :parent, :key
@@ -89,39 +89,8 @@ class BinomialHeap
   # delete min node in root of binomial tree.
   def extract_min
     extract_key = peek_min.key
-
-    # create a new heap's root list from the min tree.
-    # Also reverse the order of min-tree's children to match the strictly increased order.
-    child = @min.child
-    root_list = []
-    while child
-      root_list << child
-      child = child.sibling
-    end
-    min_head = root_list.reverse!.shift
-    current = min_head
-    
-    until root_list.empty?
-      current.sibling = root_list.first
-      current = root_list.shift 
-    end
-    current.sibling = nil
-
-    # remove @min from current heap
-    root = self.head 
-    if root == @min
-      @head = @min.sibling
-    else
-      prev = nil 
-      while root
-        if root == @min
-          prev.sibling = @min.sibling if prev
-          break
-        end
-        prev = root
-        root = root.sibling
-      end
-    end
+    min_head = new_heap_from_children
+    remove_min_from_heap
 
     # Union
     @head = merge_root_list(self, BinomialHeap.new(min_head))
@@ -137,14 +106,13 @@ class BinomialHeap
       if new_key && node.key < new_key 
         puts "the new key is greater than the old one, cause error."
       else
-        new_key ? node.key = new_key : node.key = get_new_smallest_key(key)
+        new_key ? node.key = new_key : node.key = get_new_smaller_key(key)
         swap_parent = find_and_swap_parent node
         if swap_parent
           puts "new key is #{swap_parent.key}, swap with #{node.key}"
         else
           puts "new key is #{node.key}, no swap happened."
         end
-        #print_heap
       end
       node
     else
@@ -179,7 +147,48 @@ private
     "#{node.key}, degree: #{node.degree}, parent: #{node.parent.key}, child: #{node.child ? node.child.key : "none" }"
   end
 
-  def get_new_smallest_key key
+  def remove_min_from_heap
+    # remove @min from current heap
+    root = self.head 
+    if root == @min
+      @head = @min.sibling
+    else
+      # memoized each first node is three consecutive nodes from root list.
+      prev = nil 
+      while root
+        if root == @min
+          prev.sibling = @min.sibling if prev
+          break
+        end
+        prev = root
+        root = root.sibling
+      end
+    end
+  end
+
+  def new_heap_from_children
+    # create a new heap's root list from the min tree.
+    child = @min.child
+    root_list = []
+    while child
+      root_list << child
+      child = child.sibling
+    end
+    min_head = root_list.reverse!.shift
+    current = min_head
+    
+    # Also reverse the order of min-tree's children to match the strictly increased order.
+    until root_list.empty?
+      current.sibling = root_list.first
+      current = root_list.shift 
+    end
+    # last children's sibling reset to nil
+    current.sibling = nil
+
+    min_head
+  end
+
+  def get_new_smaller_key key
     if key == 0
       gen_key = -(Random.new.rand(key + 2).to_i)
     else

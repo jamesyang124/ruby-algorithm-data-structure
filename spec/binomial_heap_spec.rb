@@ -31,6 +31,5 @@ describe "BinomialHeap" do
   it "delete key 23" do
     @x.delete_key 23
     expect(@x.head.key).to equal 18
-    @x.polu
   end
 end 
