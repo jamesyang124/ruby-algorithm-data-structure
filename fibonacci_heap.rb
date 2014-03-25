@@ -98,8 +98,18 @@ class FibonacciHeap
     get_min
   end
 
-  def decrease_key
-    
+  def decrease_key(key, new_key = nil)
+    if node = search_key(key)
+      if new_key && node.key < new_key 
+        puts "the new key is greater than the old one, cause error."
+      else
+        new_key ? node.key = new_key : node.key = get_new_smaller_key(key)
+        # TODO
+      end
+      node
+    else
+      puts "Cannot find that key in heap."
+    end
   end
 
   def delete_key
@@ -183,6 +193,35 @@ private
       find_root_head = find_root_head.left while find_root_head.left
       @root_head = find_root_head
     end
+  end
+
+public 
+
+  def search_key key
+    node = self.root_head
+    while node
+      return node if node.key == key
+      node_child = node.child    
+      while node_child && node_child.parent == node
+        return node_child if node_child.key == key
+        node_child_sib = node_child.right
+        while node_child_sib && node_child_sib.parent == node
+          return node_child_sib if node_child_sib.key == key
+          node_child_sib = node_child_sib.right
+        end
+        node_child = node_child.child
+      end
+      node = node.right
+    end
+  end
+
+  def get_new_smaller_key key
+    gen_key = -Random.new.rand(key + 2).to_i
+    # generate unique key which not exist in heap.
+    while (search_key gen_key) != nil
+      gen_key = -Random.new.rand(key + 2).to_i 
+    end
+    gen_key
   end
 
   def print_helper node
