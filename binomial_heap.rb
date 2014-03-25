@@ -13,7 +13,7 @@ class BinomialNode
   def initialize key
     self.degree = 0
     self.key = key
-    self.child = nil && self.sibling = nil && self.parent = nil
+    #self.child = nil && self.sibling = nil && self.parent = nil
   end
 
   def < (node)
@@ -50,11 +50,11 @@ class BinomialHeap
     end
   end
 
-  # create new heap for insert key, then merge to original heap
+  # create new heap for insert key, then consolidate/merge to original heap
   def insert key
-    head = merge_root_list(self, BinomialHeap.new(key))
+    head = union(self, BinomialHeap.new(key))
     h_next = head.sibling
-    merge(head, h_next)
+    consolidate(head, h_next)
   end
 
   def min
@@ -93,9 +93,9 @@ class BinomialHeap
     remove_min_from_heap
 
     # Union
-    @head = merge_root_list(self, BinomialHeap.new(min_head))
+    @head = union(self, BinomialHeap.new(min_head))
     h_next = head.sibling
-    merge(head, h_next)
+    consolidate(head, h_next)
     # get new @min
 
     extract_key
@@ -174,8 +174,8 @@ private
       root_list << child
       child = child.sibling
     end
-    min_head = root_list.reverse!.shift
-    current = min_head
+    min_child_head = root_list.reverse!.shift
+    current = min_child_head
     
     # Also reverse the order of min-tree's children to match the strictly increased order.
     until root_list.empty?
@@ -183,9 +183,8 @@ private
       current = root_list.shift 
     end
     # last children's sibling reset to nil
-    current.sibling = nil
-
-    min_head
+    current.sibling = nil if current
+    min_child_head
   end
 
   def get_new_smaller_key key
@@ -231,8 +230,8 @@ private
     end
   end
 
-  # return new head for 2 merge heaps
-  def merge_root_list heap_x, heap_y
+  # return new head for 2 union heaps
+  def union heap_x, heap_y
     return heap_y.head if !heap_x.head
     return heap_x.head if !heap_y.head
 
@@ -269,7 +268,7 @@ private
     return self.head
   end
 
-  def merge current_head, next_head
+  def consolidate current_head, next_head
     previous_head = nil
     while next_head 
       # Root list has strictly increse order by degree.
@@ -284,18 +283,18 @@ private
         if current_head.key > next_head.key
           # if previous head already exist, then the head of root list will not change any more.
           previous_head ? (previous_head.sibling = next_head) : (@head = next_head)
-          merge_trees(current_head, next_head)
+          merge_link(current_head, next_head)
           current_head = next_head
         else
           current_head.sibling = next_head.sibling
-          merge_trees(next_head, current_head)
+          merge_link(next_head, current_head)
         end
       end
       next_head = current_head.sibling
     end
   end
 
-  def merge_trees node_x, node_y
+  def merge_link node_x, node_y
     node_x.parent = node_y
     node_x.sibling = node_y.child
     node_y.child = node_x

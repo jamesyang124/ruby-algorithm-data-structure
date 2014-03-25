@@ -19,9 +19,15 @@ describe "BinomialHeap" do
   end
 
   it "extract min" do
-    @x.print_heap
     expect(@x.min.key).to equal 0
     expect(@x.extract_min).to equal 0
+    expect(@x.extract_min).to equal 16
+    expect(@x.extract_min).to equal 18
+    expect(@x.extract_min).to equal 19
+    expect(@x.extract_min).to equal 20
+    expect(@x.extract_min).to equal 23
+    expect(@x.extract_min).to equal 27
+    expect(@x.extract_min).to equal 100
   end
 
   it "decrease key 19" do
