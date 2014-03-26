@@ -22,7 +22,6 @@
 │   ├── binomial_heap_spec.rb
 │   ├── fibonacci_heap_spec.rb
 │   └── spec_helper.rb
-├── tail_recursive_simple_calculator.rb
 └── topological_sort.rb
 
 1 directory, 23 files
