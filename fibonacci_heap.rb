@@ -15,6 +15,14 @@ class FibonacciNode
   end
 end
 
+# http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap21.htm
+# We shall assume that a unit of potential can pay for a constant amount of work,
+# where the constant is sufficiently large to cover the cost of any of the specific constant-time pieces of work that we might encounter.
+
+# Potential function to analysis performance of Fibonacci heap operations. [amortized analysis]
+# P(H) = t(H) + 2*m(H), H is heap, t is tree counts, m is makred node
+# The potential is nonnegative at all subsequent times.
+
 class FibonacciHeap
   attr_accessor :root_head, :min, :size, :root_tail
 
@@ -35,6 +43,10 @@ class FibonacciHeap
   end
 
   # Unlike binomial heap, fib heap does not try to consolidate the heap for insertion.
+  # For heap h, current tree count t, and marked node,
+  # the increase in potential for insertion operation:
+  # ((t + 1) + 2*m) - (t + 2*m) = 1
+  # Since the actual cost is O(1), the amortized cost is O(1) + 1 = O(1)
   def insert!(key)
     if self.min == nil
       @root_head = FibonacciNode.new key
@@ -51,6 +63,10 @@ class FibonacciHeap
     self.size += 1 
   end
 
+  # The change in potential is
+  # (H) - ((H1) + (H2)) = (t(H) + 2m(H)) - ((t(H1) + 2 m(H1)) + (t(H2) + 2m(H2))) = 0
+  # Because t(H) = t(H1) + t(H2) and m(H) = m(H1) + m(H2).
+  # => The amortized cost is the same as insertion => O(1)
   # Only when we need to union two heaps, but still build an unordered binomial trees, not consolidate yet.
   def union(heap_x, heap_y)
     return heap_y if !heap_x.root_head
@@ -65,6 +81,10 @@ class FibonacciHeap
     return heap_x 
   end
 
+  # D(n) is at most D(n) children in minimum root node.
+  # O(D(n) + t(H)) + ((D(n) + 1) + 2m(H)) - (t(H) + 2m(H))
+  # = O(D(n)) + O(t(H)) - t(H)
+  # = O(D(n)) ~= O(log n)
   def extract_min
     prev = min.left
     post = min.right 
@@ -76,6 +96,8 @@ class FibonacciHeap
         min_child_tail = min_child_tail.right 
       end
     end
+    min_child_head.parent = nil if min_child_head
+    min_child_tail.parent = nil if min_child_tail
 
     # link prev to min's first child
     # if prev = nil, then root_head == min so set root_head to next root.
@@ -86,7 +108,8 @@ class FibonacciHeap
       @root_head = min_child_head ? min_child_head : root_head.right
     end
 
-    # link post to min's rightmost child
+    # link post to min's rightmost child.
+    # if post does not exist, child list have been linked to root list so do nothing.
     if post
       post.left = min_child_tail ? min_child_tail : prev
       min_child_tail.right = post if min_child_tail
@@ -98,6 +121,9 @@ class FibonacciHeap
     get_min
   end
 
+  # c => cut trees count.
+  # ((t(H) + c) + 2(m(H) - c + 2)) - (t(H) + 2m(H)) = 4 - c
+  # O(c) + 4 - c ~= O(1)
   def decrease_key(key, new_key = nil)
     if node = search_key(key)
       if new_key && node.key < new_key 
@@ -117,13 +143,16 @@ class FibonacciHeap
     end
   end
 
-  def delete_key
-    
+  # O(D(n)) ~= O(log(n))
+  def delete_key(key)
+    decrease_key(key, get_smallest_key)
+    extract_min
   end
 
   def print_heap
     mark = []
     node = self.root_head
+    puts "############### START"
     while node
       puts "head: #{node.key}, degree: #{node.degree}"
       mark << node.key if node.mark
@@ -142,9 +171,9 @@ class FibonacciHeap
         node_child = node_child.child
       end
       node = node.right
-      puts "---------\n\n"
     end
     puts "marked: #{mark.inspect}"
+    puts "############### END"
   end
 
 private 
@@ -178,7 +207,7 @@ private
       end
       degree_list[x] = node
       node = node.right
-    end
+      end
   end
 
   def merge_link(heap, sub, base)
@@ -213,6 +242,8 @@ private
     end
   end
 
+
+
   def cascading_cut(parent)
     ancestor = parent.parent
     if ancestor
@@ -244,7 +275,7 @@ private
     # if parent marked, set parent's child to nil, otherwise set it to left or right children in precednce if exist.
     if !parent.mark && parent.child == node
       new_child = node.left || node.right
-      parent.child = new_child
+      parent.child = new_child && new_child.parent == parent ? new_child : nil
     end
     parent.child = nil if parent.mark
 
@@ -286,7 +317,16 @@ private
     gen_key
   end
 
+  def get_smallest_key
+    gen_key = -Random.new.rand(min.key + 2).to_i
+    # generate unique key which not exist in heap.
+    while (search_key gen_key) != nil && gen_key < min
+      gen_key = -Random.new.rand(min.key + 2).to_i 
+    end
+    gen_key
+  end
+
   def print_helper(node)
-    "#{node.key}, degree: #{node.degree}, parent: #{node.parent.key}, child: #{node.child ? node.child.key : "none" }"
+    "#{node.key}, degree: #{node.degree}, parent: #{node.parent ? node.parent.key : "none" }, child: #{node.child ? node.child.key : "none" }"
   end
 end

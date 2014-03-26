@@ -164,10 +164,10 @@ describe "FibonacciHeap" do
           expect(c.send(:get_new_smaller_key, 16)).to be < 16
       end
     end
-    puts "", "Third time benchmark elapsed time: #{elapsed_time}", ""
+    puts "", "Third time benchmark elapsed time: #{elapsed_time}"
   end
 
-  it "decrease key from 46 to 15" do
+  it "#decrease_key" do
     c = FibonacciHeap.new 7
     c.insert! 23
     c.insert! 17
@@ -184,18 +184,61 @@ describe "FibonacciHeap" do
       search_key(26).mark = true
     end
 
-    puts "ORIGINAL HEAP:", ""
-    c.print_heap 
-    puts "DECREASE KEY 46 TO 15:", <<-HERE 
-    
-    HERE
+    #puts "", "ORIGINAL HEAP:", ""
+    #c.print_heap 
+    #puts "", "DECREASE KEY 46 TO 15:", <<-HERE 
+    #
+    #HERE
     c.decrease_key(46, 15)
-    c.print_heap
+    expect(c.send(:search_key, 24).mark).to be_true
+    #c.print_heap
 
-    puts "", "DECREASE KEY 35 TO 5:", <<-HERE 
-    
-    HERE
+    #puts "", "DECREASE KEY 35 TO 5:", <<-HERE 
+    #
+    #HERE
     c.decrease_key(35, 5)
-    c.print_heap
+    expect(c.send(:search_key, 24).mark).to be_false
+    expect(c.send(:search_key, 26).mark).to be_false
+    #c.print_heap
+  end
+
+  it "#delete_key" do
+    c = FibonacciHeap.new 0
+    c.insert! 19
+    c.insert! 1
+    c.insert! 2 
+    c.insert! 4
+    c.insert! 16
+    c.insert! 3    
+    c.insert! 8
+    c.insert! 7
+    c.extract_min
+
+    c.delete_key 16
+    expect(c.send(:search_key, 3).mark).to be_true
+    
+    c.delete_key 4
+    expect(c.send(:search_key, 2).mark).to be_true
+    
+    c.delete_key 8
+    expect(c.send(:search_key, 7).mark).to be_true
+    
+    c.delete_key 7
+    expect(c.send(:search_key, 3).mark).to be_false
+    expect(c.send(:search_key, 2).mark).to be_true
+    expect(c.send(:search_key, 7)).to be_nil
+    
+    c.delete_key 1
+    expect(c.send(:search_key, 2).mark).to be_true
+    
+    c.delete_key 2
+    expect(c.send(:search_key, 2)).to be_nil
+    expect(c.root_head.key).to equal 3
+    
+    c.delete_key 3
+    expect(c.root_head.key).to equal 19
+    
+    c.delete_key 19
+    expect(c.root_head).to be_nil
   end
 end
