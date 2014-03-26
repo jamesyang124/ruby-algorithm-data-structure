@@ -164,7 +164,7 @@ describe "FibonacciHeap" do
           expect(c.send(:get_new_smaller_key, 16)).to be < 16
       end
     end
-    puts "Third time benchmark elapsed time: #{elapsed_time}"
+    puts "", "Third time benchmark elapsed time: #{elapsed_time}", ""
   end
 
   it "decrease key from 46 to 15" do
@@ -180,8 +180,22 @@ describe "FibonacciHeap" do
     c.insert! 35
     c.insert! 1
     c.extract_min
+    c.instance_eval do 
+      search_key(26).mark = true
+    end
 
+    puts "ORIGINAL HEAP:", ""
+    c.print_heap 
+    puts "DECREASE KEY 46 TO 15:", <<-HERE 
+    
+    HERE
+    c.decrease_key(46, 15)
     c.print_heap
 
+    puts "", "DECREASE KEY 35 TO 5:", <<-HERE 
+    
+    HERE
+    c.decrease_key(35, 5)
+    c.print_heap
   end
 end

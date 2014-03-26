@@ -122,17 +122,21 @@ class FibonacciHeap
   end
 
   def print_heap
+    mark = []
     node = self.root_head
     while node
       puts "head: #{node.key}, degree: #{node.degree}"
+      mark << node.key if node.mark
       node_child = node.child
       while node_child
         puts "\t Child: #{print_helper node_child}"
+        mark << node_child.key if node_child.mark
         node_child_sib = node_child.right
         while node_child_sib
           puts <<-HERE 
             \t Right: #{print_helper node_child_sib}
           HERE
+          mark << node_child_sib.key if node_child_sib.mark
           node_child_sib = node_child_sib.right
         end
         node_child = node_child.child
@@ -140,6 +144,7 @@ class FibonacciHeap
       node = node.right
       puts "---------\n\n"
     end
+    puts "marked: #{mark.inspect}"
   end
 
 private 
@@ -220,6 +225,13 @@ private
     end
   end
 
+  # Assumptions for cut: 
+  # 1. at some time, x was a root,
+  # 2. then x was linked to another node(a child),
+  # 3. then two children of x were removed by cuts.
+  # The field mark[x] is TRUE if steps 1 and 2 have occurred and one child of x has been cut.
+  # Because x might be the second child cut from its parent y since the time that y was linked to its children.
+  # So #cascading_cut(parent) will perform recursively in #decrease_key.
   def cut(heap, node, parent)
     if node.left
       node.left.right = node.right ? node.right : nil
@@ -229,16 +241,22 @@ private
       node.right.left = node.left ? node.left : nil
     end
     
-    if parent.child == node
+    # if parent marked, set parent's child to nil, otherwise set it to left or right children in precednce if exist.
+    if !parent.mark && parent.child == node
       new_child = node.left || node.right
       parent.child = new_child
     end
+    parent.child = nil if parent.mark
 
     parent.degree -= 1
-
-    @root_head ? @root_head.left = node : @root_head = node
-    node.right, node.left = @root_head, nil
     node.parent, node.mark = nil, false
+
+    root_parent = parent
+    root_parent = root_parent.parent while root_parent.parent
+    node.left, node.right = root_parent.left, root_parent
+    root_parent.left.right = node if root_parent.left
+    root_parent.left = node
+    @root_head = node if @root_head == root_parent
   end 
 
   def search_key(key)
@@ -246,10 +264,10 @@ private
     while node
       return node if node.key == key
       node_child = node.child    
-      while node_child && node_child.parent == node
+      while node_child 
         return node_child if node_child.key == key
         node_child_sib = node_child.right
-        while node_child_sib && node_child_sib.parent == node
+        while node_child_sib 
           return node_child_sib if node_child_sib.key == key
           node_child_sib = node_child_sib.right
         end
