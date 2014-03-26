@@ -1,4 +1,4 @@
-```sh
+```
 .
 ├── README.md
 ├── bellmen_ford.rb
@@ -14,9 +14,7 @@
 ├── floyd.rb
 ├── interpolation_search.rb
 ├── kruskal.rb
-├── list_primes.rb
 ├── prim.rb
-├── singleton_meta_case_equality.rb
 ├── spec
 │   ├── binary_heap_spec.rb
 │   ├── binomial_heap_spec.rb
@@ -24,5 +22,5 @@
 │   └── spec_helper.rb
 └── topological_sort.rb
 
-1 directory, 23 files
+1 directory, 20 files
 ```
