@@ -113,7 +113,7 @@ describe "FibonacciHeap" do
 
   end
 
-  it "search key" do
+  it "test private method #search_key" do
     c = FibonacciHeap.new 0
     c.insert! 19
     c.insert! 1
@@ -124,18 +124,18 @@ describe "FibonacciHeap" do
     c.insert! 8
     c.insert! 7
     
-    expect(c.search_key(19).key).to equal 19
-    expect(c.search_key(1).key).to equal 1 
-    expect(c.search_key(2).key).to equal 2 
-    expect(c.search_key(3).key).to equal 3 
-    expect(c.search_key(4).key).to equal 4
-    expect(c.search_key(7).key).to equal 7 
-    expect(c.search_key(8).key).to equal 8
-    expect(c.search_key(16).key).to equal 16      
-    expect(c.search_key(119)).to be_nil 
+    expect(c.send(:search_key, 19).key).to equal 19
+    expect(c.send(:search_key, 1).key).to equal 1 
+    expect(c.send(:search_key, 2).key).to equal 2 
+    expect(c.send(:search_key, 3).key).to equal 3 
+    expect(c.send(:search_key, 4).key).to equal 4
+    expect(c.send(:search_key, 7).key).to equal 7 
+    expect(c.send(:search_key, 8).key).to equal 8
+    expect(c.send(:search_key, 16).key).to equal 16      
+    expect(c.send(:search_key, 119)).to be_nil 
   end
 
-  it "generate new smallest key" do
+  it "test private method #get_new_smaller_key: new smallest key" do
     c = FibonacciHeap.new 0
     c.insert! 19
     c.insert! 1
@@ -150,20 +150,38 @@ describe "FibonacciHeap" do
     elapsed_time = Benchmark.bmbm(40) do |x|
       x.report("generate new key smaller than 1, 0, and 16") do
         10000.times do 
-          expect(c.get_new_smaller_key 1).to be < 1
-          expect(c.get_new_smaller_key 0).to be < 0
-          expect(c.get_new_smaller_key 16).to be < 16
+          expect(c.send(:get_new_smaller_key, 1)).to be < 1
+          expect(c.send(:get_new_smaller_key, 0)).to be < 0
+          expect(c.send(:get_new_smaller_key, 16)).to be < 16
         end
       end
     end
 
     elapsed_time = Benchmark.realtime do 
       10000.times do 
-          expect(c.get_new_smaller_key 1).to be < 1
-          expect(c.get_new_smaller_key 0).to be < 0
-          expect(c.get_new_smaller_key 16).to be < 16
+          expect(c.send(:get_new_smaller_key, 1)).to be < 1
+          expect(c.send(:get_new_smaller_key, 0)).to be < 0
+          expect(c.send(:get_new_smaller_key, 16)).to be < 16
       end
     end
-    puts "Third time benchmark: Elapsed time: #{elapsed_time}"
+    puts "Third time benchmark elapsed time: #{elapsed_time}"
+  end
+
+  it "decrease key from 46 to 15" do
+    c = FibonacciHeap.new 7
+    c.insert! 23
+    c.insert! 17
+    c.insert! 30
+    c.insert! 5
+    c.extract_min
+    c.insert! 24
+    c.insert! 46
+    c.insert! 26
+    c.insert! 35
+    c.insert! 1
+    c.extract_min
+
+    c.print_heap
+
   end
 end

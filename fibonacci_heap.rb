@@ -35,13 +35,14 @@ class FibonacciHeap
   end
 
   # Unlike binomial heap, fib heap does not try to consolidate the heap for insertion.
-  def insert! key
+  def insert!(key)
     if self.min == nil
       @root_head = FibonacciNode.new key
       @min = @root_head
       @root_tail = @root_head
     else
       new_node = FibonacciNode.new key
+      @root_tail = get_root_tail
       @root_tail.right = new_node
       new_node.left = @root_tail
       @root_tail = new_node
@@ -51,7 +52,7 @@ class FibonacciHeap
   end
 
   # Only when we need to union two heaps, but still build an unordered binomial trees, not consolidate yet.
-  def union heap_x, heap_y
+  def union(heap_x, heap_y)
     return heap_y if !heap_x.root_head
     return heap_x if !heap_y.root_head
 
@@ -90,7 +91,6 @@ class FibonacciHeap
       post.left = min_child_tail ? min_child_tail : prev
       min_child_tail.right = post if min_child_tail
     end
-    #require 'pry'; binding.pry
 
     consolidate
     @min = nil
@@ -104,7 +104,12 @@ class FibonacciHeap
         puts "the new key is greater than the old one, cause error."
       else
         new_key ? node.key = new_key : node.key = get_new_smaller_key(key)
-        # TODO
+        parent = node.parent
+        if parent && node.key < parent.key
+          cut(self, node, parent)
+          cascading_cut(parent)
+        end
+        @min = node if node.key < min.key
       end
       node
     else
@@ -138,6 +143,14 @@ class FibonacciHeap
   end
 
 private 
+
+  def get_root_tail
+    @root_tail = root_head
+    while root_tail.right
+      @root_tail = root_tail.right
+    end
+    root_tail
+  end
 
   def consolidate
     set, peek = Set.new([]), root_head
@@ -195,9 +208,40 @@ private
     end
   end
 
-public 
+  def cascading_cut(parent)
+    ancestor = parent.parent
+    if ancestor
+      if parent.mark == false
+        parent.mark = true
+      else
+        cut(self, parent, ancestor)
+        cascading_cut(ancestor)
+      end
+    end
+  end
 
-  def search_key key
+  def cut(heap, node, parent)
+    if node.left
+      node.left.right = node.right ? node.right : nil
+    end
+
+    if node.right
+      node.right.left = node.left ? node.left : nil
+    end
+    
+    if parent.child == node
+      new_child = node.left || node.right
+      parent.child = new_child
+    end
+
+    parent.degree -= 1
+
+    @root_head ? @root_head.left = node : @root_head = node
+    node.right, node.left = @root_head, nil
+    node.parent, node.mark = nil, false
+  end 
+
+  def search_key(key)
     node = self.root_head
     while node
       return node if node.key == key
@@ -215,7 +259,7 @@ public
     end
   end
 
-  def get_new_smaller_key key
+  def get_new_smaller_key(key)
     gen_key = -Random.new.rand(key + 2).to_i
     # generate unique key which not exist in heap.
     while (search_key gen_key) != nil
@@ -224,7 +268,7 @@ public
     gen_key
   end
 
-  def print_helper node
+  def print_helper(node)
     "#{node.key}, degree: #{node.degree}, parent: #{node.parent.key}, child: #{node.child ? node.child.key : "none" }"
   end
 end
