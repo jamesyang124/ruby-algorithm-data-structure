@@ -1,4 +1,4 @@
-# heap usually implemented by array
+# binary heap usually implemented by array
 # the heap: any parent node is larger [max-heaps] equal or smaller equal [min-heap] than its leaf.
 # insert new node from left to right
 # heap is a binary tree, so can be traverse by inorder, preorder, postorder.
