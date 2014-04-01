@@ -18,6 +18,16 @@ describe "AvlTree" do
   end
 
   it "#morris_traversal" do
-    
+    a = AvlTree.new 8
+    a.avl_insert 1
+    a.avl_insert 5
+    a.avl_insert 9
+    a.avl_insert 10
+    a.avl_insert 511
+    a.avl_insert 11
+    a.avl_insert 12
+    a.avl_insert 8.5
+    a.morris_traversal
+    p a.root.height
   end
 end
