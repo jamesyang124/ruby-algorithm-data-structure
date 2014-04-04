@@ -28,6 +28,5 @@ describe "AvlTree" do
     a.avl_insert 12
     a.avl_insert 8.5
     a.morris_traversal
-    p a.root.height
   end
 end

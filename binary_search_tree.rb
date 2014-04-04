@@ -1,5 +1,6 @@
 
 # Binary search tree. => left child smaller than parent, right child greater than parent.
+# There must be no duplicate nodes.
 # Binary tree: 
 # formal binary tree: 
 #           => every internal node has two children.
