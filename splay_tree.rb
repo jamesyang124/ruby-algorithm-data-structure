@@ -62,9 +62,7 @@ class SplayTree
     while current
       if current.l
         pre = current.l
-        while pre.r && pre.r != current
-          pre = pre.r
-        end
+        pre = pre.r while pre.r && pre.r != current
         
         if pre.r == current
           pre.r = nil
@@ -83,20 +81,70 @@ class SplayTree
 
 private
 
-  def left_rotate
-    
+  #   x             y
+  #  / \           / \
+  # t   y    =>   x   k
+  #    / \       / \
+  #   l   k     t   l
+  # move y to top of x, x's right as y's left.
+  def left_rotate(node)
+    r_child = node.r
+    node.r = r_child.l
+    r_child.l.parent = node if r_child.l
+    r_child.parent = node.parent
+    @root = r_child if !node.parent
+    if node == node.parent.l
+      node.parent.l = r_child
+    else
+      node.parent.r = r_child
+    end
+    r_child.l = node
+    node.parent = r_child
   end
 
-  def right_rotate
-    
+  #     y            x    
+  #    / \          / \   
+  #   x   k   =>   t   y  
+  #  / \              / \ 
+  # t   l            l   k
+  # move x to top of y, y's left as x's right.
+  def right_rotate(node)
+    l_child = node.l
+    node.l = l_child.r
+    l_child.r.parent = node if l_child.r    
+    l_child.parent = node.parent
+    @root = l_child if !node.parent
+    if node == node.parent.l
+      node.parent.l = l_child
+    else
+      node.parent.r = l_child
+    end
+    l_child.r = node
+    node.parent = l_child
   end
 
   def replace
     
   end
 
-  def splay
-    
+  def splay(node)
+    while node.parent
+      if (!node.parent.parent)
+        node.parent.left == node ? right_rotate(node.parent) : left_rotate(node.parent)
+      elsif node.parent.left == node && node.parent.parent.left == node.parent
+        right_rotate(node.parent.parent)
+        right_rotate(node.parent)
+      elsif node.parent.right == node && node.parent.parent.right == node.parent
+        left_rotate(node.parent.parent)
+        left_rotate(node.parent)
+      elsif node.parent.left == node && node.parent.parent.right == node.parent
+        right_rotate(node.parent)
+        left_rotate(node.parent.parent)
+      else
+        left_rotate(node.parent)
+        right_rotate(node.parent.parent)
+      end  
+    end
   end
 
   def subtree_minimum(node)
@@ -105,5 +153,9 @@ private
 
   def subtree_maximum(node)
     
+  end
+
+  def visit(node)
+    p node.key
   end
 end
