@@ -45,7 +45,7 @@ class SplayTree
       if !result.l || !result.r
         child = result.l || result.r
         if result.parent
-          result.parent.l == result ? result.parent.l = child : result.parent.r = child
+          result.parent.l == result ? (result.parent.l = child) : (result.parent.r = child)
           child.parent = result.parent
         else
           child.parent = nil
