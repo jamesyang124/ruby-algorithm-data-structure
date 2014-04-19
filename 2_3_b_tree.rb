@@ -66,10 +66,9 @@ private
         new_node = BtreeNode.new sort[2]
         new_node.p = node.p
 
-        # assign links for recursion happens
+        # assign links if recursion happens
         assign_links(node, aux, new_node) if aux
-        node.key_r = nil
-        node.size = 1
+        update_node(node, sort[0])
 
         @root = node.p
         @root.nary[0] = node
@@ -78,16 +77,14 @@ private
     else
       if node.size < 2
         node.key_l, node.key_r = sort[0], sort[1]
-        aux = node.nary
         # !node.nary.empty => is not leaf.
         assign_links(node, aux) if !node.nary.empty?
         node.size += 1
       else
         new_node = BtreeNode.new sort[2]
         new_node.p = node.p
-        node.key_r = nil
-        node.key_l = sort[0]
-        node.size = 1
+        update_node(node, sort[0])
+
         # assign link for current node
         assign_links(node, aux, new_node) if !node.nary.empty?
         aux = get_parent_aux(node, node.p, new_node)
@@ -135,6 +132,12 @@ private
       ary << split_node
     end
     ary
+  end
+
+  def update_node(node, new_key)
+    node.key_l = new_key
+    node.key_r = nil
+    node.size = 1
   end
 
   # rearrange children links
