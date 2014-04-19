@@ -64,6 +64,18 @@ describe "SplayTree" do
   end
 
   it "delete a key" do
-    
+    a = SplayTree.new 8
+    a.insert 1
+    a.insert 5
+    a.insert 9
+    a.insert 10
+    a.insert 511
+    a.insert 11
+    a.insert 12
+    a.insert 8.5
+    a.delete 1
+    expect(a.search(1)).to be_nil
+    a.delete 8.5
+    expect(a.search(8.5)).to be_nil
   end
 end

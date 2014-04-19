@@ -35,7 +35,7 @@ class SplayTree
         break
       end
     end
-    puts "#{current.key == key ? "Found" : "Not found"} key #{key} in tree."
+    puts "#{current && current.key == key ? "Found" : "Not found"} key #{key} in tree."
     current
   end
 
@@ -128,10 +128,10 @@ private
   def replace(node_u, node_v)
     if !node_u.parent
       @root = node_v 
-    elsif node_u == node_u.parent.left
-      node_u.parent.left = node_v
+    elsif node_u == node_u.parent.l
+      node_u.parent.l = node_v
     else
-      node_u.parent.right = node_v
+      node_u.parent.r = node_v
     end  
     node_v.parent = node_u.parent if node_v
   end
@@ -151,6 +151,7 @@ private
         left_rotate(node.parent)
       else
         left_rotate(node.parent)
+        # node's parent is node's grand parent now.  
         right_rotate(node.parent)
       end  
     end
