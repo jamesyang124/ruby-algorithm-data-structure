@@ -5,7 +5,7 @@ class BtreeNode
   # nary[0] => left, nary[1] => mid, nary[2] => right
   # n => size
   # p => parent
-  attr_accessor :key_l, :key_r, :nary, :size, :p, :isLeaf
+  attr_accessor :key_l, :key_r, :nary, :size, :p
   
   def initialize(key)
     @key_l = key
