@@ -41,7 +41,27 @@ describe "Red Black Tree" do
   end
 
   it "delete a element" do
-    
+    a = RBTree.new 5
+    a.insert 7
+    a.insert 8
+    a.insert 4
+    a.insert 1
+    a.insert 0
+    a.insert 2
+    a.insert 1.5    
+    a.insert 9
+    a.insert 8.5
+
+    a.print_tree
+    puts "DELETE 0\n\n\n"
+    # !(node.l && node.l.key) && !(node.r && node.l.key)
+    a.delete 0 
+    expect(a.search(0)).to be_nil 
+    a.delete 1.5
+    expect(a.search(1.5)).to be_nil 
+    a.delete 4 
+
+    a.print_tree 
   end
 
   it "print the tree" do

@@ -52,10 +52,10 @@ class RBTree
       end
     end
     root.color = BLACK
-#    binding.pry
   end
 
-  # current is pred or succ, so has at most one child in any case.
+  # pick either succ or pred are fine. In here we prefer succ. 
+  # current is succ, so has at most one child in any case.
   # case 1 current is red leaf
   
   # impossible case 1 : current is red with 1 child
@@ -70,17 +70,28 @@ class RBTree
     # sib is black, sib with two black children
     # sib is black, sib with one or two red children
 
-  # pick either succ or pred are fine. In here we prefer succ. 
   def delete(key)
     node = search key
-    if !node.l && !node.r
-      # It's leaf, just remove it.
-      node.p.l == node ? node.p.l = nil : node.p.r = nil
+    
+    if !(node.l && node.l.key) && !(node.r && node.l.key)
+      # It's leaf, just replace it to null-node for its parent.
+      if node.p 
+        null_node = RBNode.new nil, BLACK
+        node.p.l == node ? node.p.l = null_node : node.p.r = null_node
+        null_node.p = node.p
+        adjust(null_node)
+      else
+        @root = nil
+      end
     elsif has_one_child(node)
       child = node.r || node.l
       # Only color case: child must be red leaf. node must be black.
-      node.p.l == node ? node.p.l = child : node.p.r = child
-      child.p = node.p
+      if node.p
+        node.p.l == node ? node.p.l = child : node.p.r = child
+        child.p = node.p
+      else
+        @root = child
+      end
       child.color = node.color # must be black
     else
       succ = find_succ node
@@ -92,18 +103,25 @@ class RBTree
         if succ == node.r
           node.p.l == node ? node.p.l = succ : node.p.r = succ
           succ.l, succ.p = node.l, node.p
-          succ.color = node.color
+          node.l.p = succ
           if succ.r
-            succ.r.color = succ.color
-            adjust(succ.r)
+            if succ.color == BLACK
+              if succ.r.color == RED 
+                succ.r.color = BLACK 
+              else
+                succ.color = node.color
+                adjust(succ.r)
+              end
+            end
           end
         else
           node.key, succ.key = succ.key, node.key
           succ.p.l == succ ? succ.p.l = succ.r : succ.p.r = succ.r
-          if succ.r
-            succ.r.p = succ.p
-            succ.r.color = succ.color
-            adjust(succ.r)
+          if succ.r   
+            succ.r.p = succ.p         
+            if succ.color == BLACK
+              succ.r.color == RED ? succ.r.color == BLACK : adjust(succ.r)
+            end
           end  
         end
       end
@@ -122,7 +140,7 @@ class RBTree
         break
       end
     end
-    current
+    current && current.key ? current : nil 
   end
 
   def print_tree(node = root)
@@ -135,7 +153,7 @@ class RBTree
 
   def visit node
     if node.key 
-      puts "Node #{node.key}, l: #{node.l && node.l.key ? node.l.key : "leaf" }, r: #{node.r && node.r.key ? node.r.key : "leaf" }, parent: #{node.p.key if node.p }, color: #{node.color == 1 ? "BLACK" : "RED"}"
+      puts "Node #{node.key}, l: #{node.l && node.l.key ? node.l.key : "leaf" }, r: #{node.r && node.r.key ? node.r.key : "leaf" }, parent: #{node.p.key if node.p }, color: #{correct_color(node.color)}"
     else
       puts "Leaf Node, parent: #{node.p.key}, color: #{node.color == 1 ? "BLACK" : "RED"}"
     end
@@ -143,26 +161,52 @@ class RBTree
 
 private
   
+  def correct_color(color)
+    case color
+    when 0
+      "RED"
+    when 1
+      "BLACK"
+    else
+      "WRONG COLOR"
+    end
+  end
+
+  # If deleted node's color is black, we adjust it.
+  # node's color has been replace to deleted node's color which is black in all case.
   def adjust(node)
-    if node.p.color == BLACK && node.color == BLACK
-      sib  = sibling node
-      if sib.color == RED
-        sib == node.p.r ? left_rotate(node.p) : right_rotate(node.p)
-        sib.color, node.p.color = node.p.color, sib.color
-        adjust(node)
-      else
-        if sib.l.color == BLACK && sib.r.color == BLACK
-          sib.color == RED
+    sib = sibling node
+    if sib.color == RED
+      # case 2
+      sib == node.p.r ? left_rotate(node.p) : right_rotate(node.p)
+      sib.color, node.p.color = node.p.color, sib.color
+      adjust(node)
+    else
+      if sib.l.color == BLACK && sib.r.color == BLACK
+        if sib.p.color == RED
+          sib.color, sib.p.color = RED, BLACK
+        else
+          # case 3, sib.p is black, change color
+          sib.color = RED
           adjust(node.p)
-        elsif sib.r.color == RED
-          left_rotate(node.p)
-          sib.color, node.p.color = node.p.color, sib.color
-          sib.r.color = BLACK
-        elsif sib.l.color == RED && sib.r.color == BLACK
-          right_rotate(sib)
-          sib.color, sib.p.color = sib.p.color, sib.color
-          adjust(node) 
-        end
+        end  
+      elsif sib.l.color == RED && sib.r.color == BLACK && node == node.p.l
+        right_rotate(sib)
+        sib.color, sib.p.color = sib.p.color, sib.color
+        adjust(node) 
+      elsif sib.r.color == RED && sib.l.color == BLACK && node == node.p.r
+        left_rotate(sib)
+        sib.color, sib.p.color = sib.p.color, sib.color
+        adjsut(node)
+      elsif sib.r.color == RED && node == node.p.l
+        left_rotate(node.p)
+        # sib's color must be black
+        sib.color, node.p.color = node.p.color, sib.color
+        sib.r.color = BLACK
+      elsif sib.l.color == RED && node == node.p.r
+        right_rotate(node.p)
+        sib.color, node.p.color = node.p.color, sib.color
+        sib.l.color = BLACK
       end
     end
   end
@@ -206,8 +250,9 @@ private
   end
 
   def sibling(node)
-    if p = node.p
-      sib = p.l == node ? p.r : p.l
+    p = node.p
+    if p
+      sib = (p.l == node ? p.r : p.l)
     end
     sib
   end
