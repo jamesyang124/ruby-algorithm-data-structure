@@ -72,8 +72,7 @@ class RBTree
 
   def delete(key)
     node = search key
-    
-    if !(node.l && node.l.key) && !(node.r && node.l.key)
+    if node.l.key == nil && node.r.key == nil
       # It's leaf, just replace it to null-node for its parent.
       if node.p 
         null_node = RBNode.new nil, BLACK
@@ -84,13 +83,14 @@ class RBTree
         @root = nil
       end
     elsif has_one_child(node)
-      child = node.r || node.l
+      child = node.r && node.r.key ? node.r : node.l
       # Only color case: child must be red leaf. node must be black.
       if node.p
         node.p.l == node ? node.p.l = child : node.p.r = child
         child.p = node.p
       else
         @root = child
+        child.p = nil
       end
       child.color = node.color # must be black
     else
@@ -99,11 +99,16 @@ class RBTree
       # succ has at most one child in right branch.
 
       # succ is right child of node.
+      binding.pry if node.key == 8
       if succ && succ.key
         if succ == node.r
-          node.p.l == node ? node.p.l = succ : node.p.r = succ
+          if node.p 
+            node.p.l == node ? node.p.l = succ : node.p.r = succ
+          else
+            @root = succ
+          end
           succ.l, succ.p = node.l, node.p
-          node.l.p = succ
+          succ.l.p = succ
           if succ.r
             if succ.color == BLACK
               if succ.r.color == RED 
@@ -116,7 +121,9 @@ class RBTree
           end
         else
           node.key, succ.key = succ.key, node.key
-          succ.p.l == succ ? succ.p.l = succ.r : succ.p.r = succ.r
+          if succ.p 
+            succ.p.l == succ ? succ.p.l = succ.r : succ.p.r = succ.r
+          end
           if succ.r   
             succ.r.p = succ.p         
             if succ.color == BLACK
@@ -144,11 +151,13 @@ class RBTree
   end
 
   def print_tree(node = root)
-    print_tree node.l if node.l
-    puts if node.l && node.l.key
-    visit node
-    puts if node.r && node.r.key
-    print_tree node.r if node.r
+    if node
+      print_tree node.l if node.l
+      puts if node.l && node.l.key
+      visit node
+      puts if node.r && node.r.key
+      print_tree node.r if node.r
+    end
   end
 
   def visit node
@@ -176,12 +185,13 @@ private
   # node's color has been replace to deleted node's color which is black in all case.
   def adjust(node)
     sib = sibling node
-    if sib.color == RED
+    if sib && sib.color == RED
       # case 2
       sib == node.p.r ? left_rotate(node.p) : right_rotate(node.p)
       sib.color, node.p.color = node.p.color, sib.color
       adjust(node)
-    else
+    elsif sib && sib.color == BLACK
+      return if sib.key == nil
       if sib.l.color == BLACK && sib.r.color == BLACK
         if sib.p.color == RED
           sib.color, sib.p.color = RED, BLACK
@@ -212,11 +222,13 @@ private
   end
 
   def has_one_child(node)
-    (node.l && !node.r) || (node.r && !node.l)
+    r_exist = node.r && node.r.key
+    l_exist = node.l && node.l.key
+    (l_exist && !r_exist) || (r_exist && !l_exist)
   end
 
   def find_pred(node)
-    if node.l && node.l.key != nil
+    if node.l && node.l.key
       current = node.l
       while current.r && current.r.key
         current = current.r
@@ -233,7 +245,7 @@ private
   end
 
   def find_succ(node)
-    if node.r && node.r.key != nil
+    if node.r && node.r.key
       current = node.r
       while current.l && current.l.key
         current = current.l
