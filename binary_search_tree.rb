@@ -273,14 +273,14 @@ end
 #BinaryTree.create_tree(7)
 #BinaryTree.insert(8, 9, 2, 1, 5, 3, 6, 4)
 
-BinaryTree.create_tree(10)
-BinaryTree.insert(20, 39, 42, 45)
-
-
-puts ""
-BinaryTree.inorder(BinaryTree.root)
-
-BinaryTree.delete(10)
-
-
-BinaryTree.morris_inorder_trversal nil
+#BinaryTree.create_tree(10)
+#BinaryTree.insert(20, 39, 42, 45)
+#
+#
+#puts ""
+#BinaryTree.inorder(BinaryTree.root)
+#
+#BinaryTree.delete(10)
+#
+#
+#BinaryTree.morris_inorder_trversal nil

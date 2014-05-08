@@ -1,4 +1,10 @@
-require 'pry'
+# Red-black tree is an bst which interprete the 2-3-4 B tree.
+# properties:
+ # 1. Root must be black
+ # 2. Never occur two consecutive red nodes.
+ # 3. Leaf which is null node, color as black.
+ # 4. Every non-leaf node has same black count from it to each leaf by simple path. 
+ # 5. Node's color is either red or black.
 
 RED = 0
 BLACK = 1
@@ -26,6 +32,9 @@ class RBTree
     while node != root && node.p.color == RED
       u = uncle node
       if u.color == RED
+        # both uncle and parent are red, parent is red so must have grand parent.
+        # we change uncle and parent's color to black, grand parent to red.
+        # Then recursively solve potential problem from grand parent.
         node.p.color, u.color = BLACK, BLACK
         grand_parent(node).color = RED
         node = grand_parent(node)
@@ -36,6 +45,7 @@ class RBTree
             node = node.p
             left_rotate node 
           end
+          # do right rotation and swap parent and grand parent's color
           node.p.color = BLACK
           grand_parent(node).color = RED
           right_rotate grand_parent(node)
@@ -56,19 +66,26 @@ class RBTree
 
   # pick either succ or pred are fine. In here we prefer succ. 
   # current is succ, so has at most one child in any case.
+
   # case 1 current is red leaf
   
   # impossible case 1 : current is red with 1 child
     # => must be black child or violate rb tree propery.
     # => cannot has black child, if so, black count in path not balanced.
+
   # impossible case 2 : current is black with 1 black child
     # => black count in each path cannot balanced
 
   # case 2 current is black, has only one red child
+
   # case 3 cuurent is black, has no children => check siblings
-    # sib is red
-    # sib is black, sib with two black children
-    # sib is black, sib with one or two red children
+    # 1 sib is red
+    # 2 sib is black, sib with two black children
+    # 4 sib is black, sib has one red children, in left or right.
+      # 1 if sib red child in left, current in parent's right
+      # 2 if sib red child in right, current in parent's left
+      # 3 if sib red child in left, current in parent's left
+      # 4 if sib red child in right, current in parent's right
 
   def delete(key)
     node = search key
@@ -99,7 +116,6 @@ class RBTree
       # succ has at most one child in right branch.
 
       # succ is right child of node.
-      binding.pry if node.key == 8
       if succ && succ.key
         if succ == node.r
           if node.p 
@@ -186,34 +202,38 @@ private
   def adjust(node)
     sib = sibling node
     if sib && sib.color == RED
-      # case 2
+      # case 3 - 1
       sib == node.p.r ? left_rotate(node.p) : right_rotate(node.p)
       sib.color, node.p.color = node.p.color, sib.color
       adjust(node)
     elsif sib && sib.color == BLACK
       return if sib.key == nil
       if sib.l.color == BLACK && sib.r.color == BLACK
+        # case 3 - 2, sib.p is black, change color
         if sib.p.color == RED
           sib.color, sib.p.color = RED, BLACK
         else
-          # case 3, sib.p is black, change color
           sib.color = RED
           adjust(node.p)
         end  
       elsif sib.l.color == RED && sib.r.color == BLACK && node == node.p.l
+        # case 3 - 4 - 3
         right_rotate(sib)
         sib.color, sib.p.color = sib.p.color, sib.color
         adjust(node) 
       elsif sib.r.color == RED && sib.l.color == BLACK && node == node.p.r
+        # case 3 - 4 - 4
         left_rotate(sib)
         sib.color, sib.p.color = sib.p.color, sib.color
         adjsut(node)
       elsif sib.r.color == RED && node == node.p.l
+        # case 3 - 4 - 2
         left_rotate(node.p)
         # sib's color must be black
         sib.color, node.p.color = node.p.color, sib.color
         sib.r.color = BLACK
       elsif sib.l.color == RED && node == node.p.r
+        # case 3 - 4 - 1
         right_rotate(node.p)
         sib.color, node.p.color = node.p.color, sib.color
         sib.l.color = BLACK
