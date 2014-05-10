@@ -211,7 +211,7 @@ class BinaryTree
 # Binary search tree add, always compare from self.root
   def self.insert *list
     until list.empty?
-      node = Node.new(list.shift)
+      node = Node.new(*list.shift)
       current = self.root
       while current
         tmp = current 
@@ -238,7 +238,7 @@ class BinaryTree
 #      b) Go to this left child, i.e., current = current->left
 #      c) revert (a) when visit, that current node again(has been append to rightmost node) => r_td.
 # no recursive, no stack required
-  def self.morris_inorder_trversal node
+  def self.morris_inorder_trversal(node =nil)
     current = node ? node : self.root
     while current
       if current.left_node 
