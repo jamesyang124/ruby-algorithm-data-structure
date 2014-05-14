@@ -238,7 +238,7 @@ class BinaryTree
 #      b) Go to this left child, i.e., current = current->left
 #      c) revert (a) when visit, that current node again(has been append to rightmost node) => r_td.
 # no recursive, no stack required
-  def self.morris_inorder_trversal(node =nil)
+  def self.morris_inorder_traversal(node =nil)
     current = node ? node : self.root
     while current
       if current.left_node 
@@ -283,4 +283,4 @@ end
 #BinaryTree.delete(10)
 #
 #
-#BinaryTree.morris_inorder_trversal nil
+#BinaryTree.morris_inorder_traversal nil
