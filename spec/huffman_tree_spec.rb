@@ -15,10 +15,14 @@ describe "HuffmanTree" do
   end
 
   it "encode" do
-    
+    tree = HuffmanTree.new
+    text = "DEAF"
+    tree.encode text
   end
 
   it "decode" do
-    
+    tree = HuffmanTree.new
+    code = 01100010100.to_s
+    tree.decode code
   end
 end

@@ -64,47 +64,58 @@ class HuffmanTree < BinaryTree
       @huf_root = t
 
       key_pair = [t.key, t.value]
-      puts "#Key Pair: #{key_pair}"
-      list.push(key_pair).sort! do |x, y|
-        x[1] <=> y[1] 
-      end
+      gt = list.index { |x| x[1] > t.value }
+      # if gt == nil, then no element greater than t.value so put it to end.
+      gt ? list.insert(gt, key_pair) : list << key_pair
     end
   end
 
   def new_tree(l, r, w)
-    tree = Node.new "P", w
+    tree = Node.new "PNode", w
     tree.l = Node.new *l 
     tree.r = Node.new *r
     tree_set.push tree
     tree
   end
 
-  def encode(key)
-    current = huf_root
-    code = ""
-    while current
-      if current.w > key
-        current = current.l
-        code << '0'
-      elsif current.w < key
-        current = current.r
-        code << '1'
-      else
-        break
-      end
+  def char_value(char)
+    GIVEN.index do |x|
+      x[0] == char
     end
-    puts "get code for key #{key}: #{code}"
+  end
+
+  def encode(str)
+    chary = str.chars
+    table = code_table
+    code = ""
+    while char = chary.shift
+      e = table.index { |x| x[0].key == char }
+      code << table[e][1]
+    end
+    puts "get code for str #{str}: #{code}"
+  end
+
+  def code_table
+    ary = [] << [huf_root, ""]
+    table = []
+    until ary.empty?
+      node = ary.shift
+      ary.unshift([node[0].r, node[1] + "1"]) if node && node[0].r
+      ary.unshift([node[0].l, node[1] + "0"]) if node && node[0].l
+      table << node if !node[0].r && !node[0].l
+    end
+    table
   end
 
   def decode(input)
+    input = input.to_s.chars
     current = huf_root
     str = ""
-    while input
+    while direction = input.shift
       if !current.l && !current.r
         str << current.key
         current = huf_root
       else
-        direction = input.shift
         current = direction == 0 ? current.l : current.r
       end
     end
@@ -112,9 +123,9 @@ class HuffmanTree < BinaryTree
   end
 
   def find_merged_tree(value, tree_set)
-    return tree_set.index do |x|
-        x.w == value
-      end unless tree_set.empty?
+    tree_set.index do |x|
+      x.w == value
+    end unless tree_set.empty?
   end
 
   def morris_traversal
