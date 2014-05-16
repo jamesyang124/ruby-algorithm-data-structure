@@ -1,6 +1,9 @@
+Ruby data structures & searching algorithms
+========
+
 Ruby version of data structure and searching algorithms.
 
-Comparison sorting algorithms are implemented with [Java version.](https://github.com/jamesyang124/Java.git)
+Comparison sorting algorithms are implemented with [Java version](https://github.com/jamesyang124/Java.git).
 
 ```
 .
