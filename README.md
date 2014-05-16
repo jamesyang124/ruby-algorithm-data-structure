@@ -1,4 +1,6 @@
 ```
+
+Other comparison sorting algorithms are implemented with [Java version.](https://github.com/jamesyang124/Java.git).
 .
 ├── 2_3_b_tree.rb
 ├── avl_tree.rb
