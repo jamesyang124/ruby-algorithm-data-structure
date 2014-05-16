@@ -92,7 +92,7 @@ class HuffmanTree < BinaryTree
       e = table.index { |x| x[0].key == char }
       code << table[e][1]
     end
-    puts "get code for str #{str}: #{code}"
+    puts "Text \"#{str}\"'s code is #{code}"
   end
 
   def code_table
@@ -108,18 +108,20 @@ class HuffmanTree < BinaryTree
   end
 
   def decode(input)
-    input = input.to_s.chars
-    current = huf_root
-    str = ""
-    while direction = input.shift
-      if !current.l && !current.r
-        str << current.key
-        current = huf_root
-      else
-        current = direction == 0 ? current.l : current.r
+    chary = input.chars
+    table = code_table
+    output = ""
+    while i = chary.shift
+      (tmp ||= "") << i
+      table.each do |t| 
+        if t[1] == tmp
+          output << t[0].key
+          tmp = ""
+          break
+        end
       end
     end
-    str
+    puts "Code \"#{input}\"'s text is #{output}"
   end
 
   def find_merged_tree(value, tree_set)

@@ -22,7 +22,9 @@ describe "HuffmanTree" do
 
   it "decode" do
     tree = HuffmanTree.new
-    code = 01100010100.to_s
+    code = "01100010100"
+    tree.decode code
+    code = "00010101100000"
     tree.decode code
   end
 end
