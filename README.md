@@ -1,5 +1,5 @@
 Ruby data structures & searching algorithms
-========
+===
 
 Ruby version of data structure and searching algorithms.
 
