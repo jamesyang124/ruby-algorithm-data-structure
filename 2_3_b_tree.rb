@@ -100,21 +100,22 @@ private
     pred
   end
 
-  # hole is special node has only one link because its a combination from sub-leaf node to current node.
+  # hole is a special node has only one link because its a combination from sub-leaf node to current node.
   def handle_hole(hole)
     if hole.p && hole.p.size == 1
       loc, sib = sib_of_2nodes_parent hole.p, hole
       
       if sib.size == 1
-        # if loc == 1, hole has 2-node parent, 2-node right sibling
-        # if loc == 0, hole has 2-node parent, 2-node left sibling
         if loc == 1
+          # if loc == 1, hole has 2-node parent, 2-node right sibling
           sib.key_l, sib.key_r = hole.p.key_l, sib.key_l
           sib.nary.unshift(hole.nary.shift) unless hole.nary.empty?
         else
+          # if loc == 0, hole has 2-node parent, 2-node left sibling
           sib.key_r = hole.p.key_l
           sib.nary << hole.nary.shift unless hole.nary.empty?
         end
+
         sib.nary.each { |e| e.p = sib }
         hole.p.key_l = nil
         hole.p.nary.clear << sib
@@ -131,6 +132,7 @@ private
           hole.key_l, sib.p.key_l, sib.key_r = sib.p.key_l, sib.key_r , sib.key_r, nil
           hole.nary << sib.nary.pop unless sib.nary.empty? 
         end
+
         hole.nary.each { |e| e.p = hole }
         hole.size = 1
         sib.size = 1
@@ -155,6 +157,7 @@ private
           sib.nary.concat hole.nary
           hole.p.nary.delete_if { |e| e == hole } 
         end
+
         sib.nary.each { |e| e.p = sib }
         hole.p.size = 1
         sib.size = 2
@@ -172,6 +175,7 @@ private
           hole.key_l, hole.p.key_l, sib.key_r = hole.p.key_l, sib.key_r, nil
           hole.nary.unshift(sib.nary.pop) unless sib.nary.empty?
         end
+        
         hole.nary.each { |e| e.p = hole }
         hole.size = 1
         sib.size = 1  
