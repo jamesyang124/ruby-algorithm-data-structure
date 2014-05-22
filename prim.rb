@@ -3,8 +3,10 @@
 # Also the same: O(|V|+|E|)log(V) => binary heap and adjacent list
 #                O(|V^2|) => adjacent matrix
 
-# sort edges set, then find minimum edge whose vetex is not in v set.
+# sort edges set, then find minimum edge whose source vertex in vset and destination vertex is not in v set.
 # iterate V times then we get minimum cost spanning tree.
+
+# difference between Kruskal and Prim => Prim pick edges must be from the source vertices and reach to other vertices which is not in current source set.
 
 $tree = []
 V = 6

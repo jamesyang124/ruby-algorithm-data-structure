@@ -7,22 +7,22 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 
 ```
 .
-├── 2_3_b_tree.rb    # refactoring done.
+├── 2_3_b_tree.rb             # refactoring done.
 ├── avl_tree.rb
-├── bellmen_ford.rb  # refactoring done.
+├── bellmen_ford.rb           # refactoring done.
 ├── binary_heap.rb
-├── binary_search_tree.rb
+├── binary_search_tree.rb     #
 ├── binomial_heap.rb
-├── breadth_first_search.rb
-├── depth_first_search.rb
+├── breadth_first_search.rb   #
+├── depth_first_search.rb   
 ├── dijkstra_unsorted_array.rb
 ├── fibonacci_heap.rb
-├── fibonacci_search.rb
+├── fibonacci_search.rb       #
 ├── floyd.rb
-├── huffman_tree.rb
+├── huffman_tree.rb           #
 ├── interpolation_search.rb
-├── kruskal.rb
-├── prim.rb    # refactoring done.
+├── kruskal.rb                # refactoring done.
+├── prim.rb                   # refactoring done.
 ├── red_black_tree.rb
 ├── skip_list.rb
 ├── README.md
