@@ -22,13 +22,17 @@ class Btree
   end
 
   def insert(key)
-    node = find_leaf key
-    split(node, key)
+    result = find_leaf key
+    if result.key_l == key or result.key_r == key
+      puts "Not allowed to insert duplicate key value."
+    else
+      split(result, key)
+    end
   end
 
   def search(key)
     result = find_leaf key
-    if result
+    if result.key_l == key or result.key_r == key
       puts "Node #{key}, left:s #{result.key_l}, right: #{result.key_r}"
     else
       puts "Find nothing."
@@ -99,102 +103,78 @@ private
   # hole is special node has only one link because its a combination from sub-leaf node to current node.
   def handle_hole(hole)
     if hole.p && hole.p.size == 1
-      loc, sib = get_2_sib hole.p, hole
+      loc, sib = sib_of_2nodes_parent hole.p, hole
       
-      if loc == 1
-        if sib.size == 1
-          # hole has 2-node parent, 2-node right sibling, rotation
-          sib.nary.insert(0, hole.nary[0]) if !hole.nary.empty?
-          sib.nary.each { |e| e.p = sib }
+      if sib.size == 1
+        # if loc == 1, hole has 2-node parent, 2-node right sibling
+        # if loc == 0, hole has 2-node parent, 2-node left sibling
+        if loc == 1
           sib.key_l, sib.key_r = hole.p.key_l, sib.key_l
-          hole.p.key_l = nil
-          hole.p.nary.clear << sib
-          sib.size = 2
-          hole.p.size = 0
-          handle_hole(hole.p)
+          sib.nary.unshift(hole.nary.shift) unless hole.nary.empty?
         else
-          # hole has 2-node parent, 3-node right sibling, rotation
-          #require 'pry'; binding.pry if hole.p.key_l == 13
-          hole.key_l, sib.p.key_l, sib.key_l , sib.key_r = sib.p.key_l, sib.key_l, sib.key_r, nil
-          hole.nary << sib.nary.shift if !sib.nary.empty? 
-          hole.nary.each { |e| e.p = hole }
-          hole.size = 1
-          sib.size = 1
-        end
-      else
-        if sib.size == 1
-          # hole has 2-node parent, 2-node left sibling, rotation
-          sib.nary << hole.nary.shift if !hole.nary.empty?
-          sib.nary.each { |e| e.p = sib }
           sib.key_r = hole.p.key_l
-          hole.p.key_l = nil
-          hole.p.nary.clear << sib
-          hole.p.size = 0
-          sib.size = 2
-          handle_hole(hole.p)
+          sib.nary << hole.nary.shift unless hole.nary.empty?
+        end
+        sib.nary.each { |e| e.p = sib }
+        hole.p.key_l = nil
+        hole.p.nary.clear << sib
+        sib.size = 2
+        hole.p.size = 0
+        handle_hole(hole.p)
+      else
+        if loc == 1
+          # hole has 2-node parent, 3-node right sibling, rotation
+          hole.key_l, sib.p.key_l, sib.key_l , sib.key_r = sib.p.key_l, sib.key_l, sib.key_r, nil
+          hole.nary << sib.nary.shift unless sib.nary.empty? 
         else
           # hole has 2-node parent, 3-node left sibling, rotation
           hole.key_l, sib.p.key_l, sib.key_r = sib.p.key_l, sib.key_r , sib.key_r, nil
-          hole.nary << sib.nary.pop if !sib.nary.empty? 
-          hole.nary.each { |e| e.p = hole }
-          hole.size = 1
-          sib.size = 1
+          hole.nary << sib.nary.pop unless sib.nary.empty? 
         end
+        hole.nary.each { |e| e.p = hole }
+        hole.size = 1
+        sib.size = 1
       end
     elsif hole.p && hole.p.size == 2
-      loc, sib = get_3_sib hole.p, hole
-      if loc == 0
-        if sib.size == 1
-          # hole has 3-node parent, 2-node left sibling, rotation  
+      loc, sib = sib_of_3nodes_parent hole.p, hole
+
+      if sib.size == 1
+        if loc == 0
+          # hole has 3-node parent, 2-node left sibling, rotation 
           sib.key_r, hole.p.key_r = hole.p.key_r, nil
           sib.nary.concat hole.nary
-          sib.nary.each { |e| e.p = sib }
           hole.p.nary.pop
-          hole.p.size = 1
-          sib.size = 2
-        else
-          # hole has 3-node parent, 3-node left sibling, rotation
-          hole.key_l, hole.p.key_r, sib.key_r = hole.p.key_r, sib.key_r, nil
-          hole.nary.insert(0, sib.nary.pop) if !sib.nary.empty?
-          hole.nary.each { |e| e.p = hole }
-          hole.size = 1
-          sib.size = 1  
-        end
-      elsif loc == 1
-        # hole has 3-node parent, 2-node right sibling, rotation
-        if sib.size == 1 
-          sib.nary.insert(0, hole.nary[0]) if !hole.nary.empty?
-          sib.nary.each { |e| e.p = sib } 
+        elsif loc == 1
+          # hole has 3-node parent, 2-node right sibling, rotation
           sib.key_l, sib.key_r, hole.p.key_l, hole.p.key_r = hole.p.key_l, sib.key_l, hole.p.key_r, nil
-          hole.p.nary.shift 
-          hole.p.size = 1
-          sib.size = 2
+          sib.nary.unshift(hole.nary.shift) unless hole.nary.empty?
+          hole.p.nary.shift
         else
-          # hole has 3-node parent, 3-node right sibling, rotation  
-          hole.key_l, hole.p.key_l, sib.key_l, sib.key_r = hole.p.key_l, sib.key_l, sib.key_r, nil
-          hole.nary << sib.nary.shift if !sib.nary.empty?
-          hole.nary.each { |e| e.p = hole }
-          hole.size = 1
-          sib.size = 1
-        end
-      else
-        # hole in middle, prefer to pick left sib(right is also ok).
-        if sib.size == 1
           # hole in middle and has 3-node parent, 2-node sibling.
           sib.key_r, hole.p.key_l, hole.p.key_r = hole.p.key_l, hole.p.key_r, nil
           sib.nary.concat hole.nary
-          sib.nary.each { |e| e.p = sib }
-          hole.p.nary.delete_if { |e| e == hole }
-          hole.p.size = 1
-          sib.size = 2 
+          hole.p.nary.delete_if { |e| e == hole } 
+        end
+        sib.nary.each { |e| e.p = sib }
+        hole.p.size = 1
+        sib.size = 2
+      else
+        if loc == 0
+          # hole has 3-node parent, 3-node left sibling, rotation
+          hole.key_l, hole.p.key_r, sib.key_r = hole.p.key_r, sib.key_r, nil
+          hole.nary.unshift(sib.nary.pop) unless sib.nary.empty?
+        elsif loc == 1
+          # hole has 3-node parent, 3-node right sibling, rotation  
+          hole.key_l, hole.p.key_l, sib.key_l, sib.key_r = hole.p.key_l, sib.key_l, sib.key_r, nil
+          hole.nary << sib.nary.shift unless sib.nary.empty?
         else
           # hole in middle and has 3-node parent, 3-node sibling.
           hole.key_l, hole.p.key_l, sib.key_r = hole.p.key_l, sib.key_r, nil
-          hole.nary.insert(0, sib.nary.pop) if !sib.nary.empty?
-          hole.nary.each { |e| e.p = hole } 
-          hole.size = 1
-          sib.size = 1  
+          hole.nary.unshift(sib.nary.pop) unless sib.nary.empty?
         end
+        hole.nary.each { |e| e.p = hole }
+        hole.size = 1
+        sib.size = 1  
       end
     else
       # hole in hole.parent. hole in root.
@@ -203,8 +183,8 @@ private
     end
   end
 
-  # node's sibling with 3-node parent 
-  def get_3_sib(parent, node)
+  # node's sibling of 3-node parent 
+  def sib_of_3nodes_parent(parent, node)
     if parent.nary[0] == node 
       return 1, parent.nary[1] 
     elsif parent.nary[2] == node
@@ -215,8 +195,8 @@ private
     end
   end
 
-  # node's sibling with 2-node parent 
-  def get_2_sib(parent, node)
+  # node's sibling of 2-node parent 
+  def sib_of_2nodes_parent(parent, node)
     if parent.nary[0] == node
       # sib in right
       return 1, parent.nary[1]
@@ -226,21 +206,20 @@ private
     end
   end
 
-  # aux is a children list for rearranging new children.
+  # aux is a children list to rearrange new children for parent's children links.
   def split(node, key, aux = nil)
-    sort = sort_key(node, key)
+    sort_ary = sort_key(node, key)
     if node == root
       if node.size < 2
-        node.key_l, node.key_r = sort[0], sort[1]
+        node.key_l, node.key_r = sort_ary[0], sort_ary[1]
         node.size += 1
       else
-        node.p = BtreeNode.new sort[1]
-        new_node = BtreeNode.new sort[2]
+        node.p = BtreeNode.new sort_ary[1]
+        new_node = BtreeNode.new sort_ary[2]
         new_node.p = node.p
 
-        # assign links if recursion happens
-        assign_links(node, aux, new_node) if aux
-        update_node(node, sort[0])
+        assign_children_links(node, aux, new_node) if aux
+        renew_node(node, sort_ary[0])
 
         @root = node.p
         @root.nary[0] = node
@@ -248,19 +227,17 @@ private
       end
     else
       if node.size < 2
-        node.key_l, node.key_r = sort[0], sort[1]
-        # !node.nary.empty => is not leaf.
-        assign_links(node, aux) if !node.nary.empty?
+        node.key_l, node.key_r = sort_ary[0], sort_ary[1]
+        assign_children_links(node, aux) unless node.nary.empty?
         node.size += 1
       else
-        new_node = BtreeNode.new sort[2]
+        new_node = BtreeNode.new sort_ary[2]
         new_node.p = node.p
-        update_node(node, sort[0])
+        renew_node(node, sort_ary[0])
 
-        # assign link for current node
-        assign_links(node, aux, new_node) if !node.nary.empty?
+        assign_children_links(node, aux, new_node) unless node.nary.empty?
         aux = get_parent_aux(node, node.p, new_node)
-        split(node.p, sort[1], aux) if node.p != nil
+        split(node.p, sort_ary[1], aux) if node.p != nil
       end
     end
   end
@@ -285,16 +262,12 @@ private
   end
 
   def sort_key(leaf, key)
-    ary = [] 
-    ary << leaf.key_l if leaf.key_l 
-    ary << leaf.key_r if leaf.key_r 
-    ary << key
-    ary.sort!
+    ary ||= [] << leaf.key_l << leaf.key_r << key
+    ary.compact.sort!
   end
 
   # aux's key is split location with tmp children.
   def get_parent_aux(leaf, parent, split_node)
-    ary = []
     ary = parent.nary
     if parent.nary[0] == leaf
       ary.insert(1, split_node)
@@ -306,14 +279,14 @@ private
     ary
   end
 
-  def update_node(node, new_key)
+  def renew_node(node, new_key)
     node.key_l = new_key
     node.key_r = nil
     node.size = 1
   end
 
   # rearrange children links
-  def assign_links(exist_node, aux, new_node = nil)
+  def assign_children_links(exist_node, aux, new_node = nil)
     exist_node.nary = []
     (0..1).each do |e| 
       if aux[e]
@@ -324,10 +297,14 @@ private
 
     if new_node != nil
       exist_node.nary[2] = nil
-      new_node.nary[0] = aux[2] if aux[2]
-      aux[2].p = new_node if aux[2]
-      new_node.nary[1] = aux[3] if aux[3]
-      aux[3].p = new_node if aux[3]
+      if aux[2]
+        new_node.nary[0] = aux[2] 
+        aux[2].p = new_node
+      end
+      if aux[3]
+        new_node.nary[1] = aux[3]
+        aux[3].p = new_node
+      end
       # delete right child for existing node.
       exist_node.nary.delete_at(2)
     else
@@ -337,4 +314,5 @@ private
       end
     end
   end
+
 end
