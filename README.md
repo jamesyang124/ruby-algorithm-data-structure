@@ -7,7 +7,7 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 
 ```
 .
-├── 2_3_b_tree.rb
+├── 2_3_b_tree.rb    # refactoring done.
 ├── avl_tree.rb
 ├── bellmen_ford.rb
 ├── binary_heap.rb

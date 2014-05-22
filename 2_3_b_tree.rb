@@ -34,8 +34,10 @@ class Btree
     result = find_leaf key
     if result.key_l == key or result.key_r == key
       puts "Node #{key}, left:s #{result.key_l}, right: #{result.key_r}"
+      result
     else
       puts "Find nothing."
+      nil
     end
   end
 
@@ -175,7 +177,7 @@ private
           hole.key_l, hole.p.key_l, sib.key_r = hole.p.key_l, sib.key_r, nil
           hole.nary.unshift(sib.nary.pop) unless sib.nary.empty?
         end
-        
+
         hole.nary.each { |e| e.p = hole }
         hole.size = 1
         sib.size = 1  

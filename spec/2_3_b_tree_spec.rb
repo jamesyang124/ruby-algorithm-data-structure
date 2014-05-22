@@ -39,8 +39,7 @@ describe "Btree" do
 
   it "insert new element" do
     a = create_tree
-    puts ""
-    a.print_list
+    expect(a.search(21)).not_to be_nil 
   end
 
   it "private #inorder_predecessor" do
@@ -56,6 +55,7 @@ describe "Btree" do
   it "private #handle_hole" do
     tree = create_tree
     hole_test tree, 17
+    expect(tree.search(17)).to be_nil
   end
 
   it "deletion" do
