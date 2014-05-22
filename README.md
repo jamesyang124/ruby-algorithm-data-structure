@@ -22,7 +22,7 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 ├── huffman_tree.rb
 ├── interpolation_search.rb
 ├── kruskal.rb
-├── prim.rb
+├── prim.rb    # refactoring done.
 ├── red_black_tree.rb
 ├── skip_list.rb
 ├── README.md
