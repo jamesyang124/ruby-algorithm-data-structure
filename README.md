@@ -14,7 +14,7 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 ├── binary_search_tree.rb     #
 ├── binomial_heap.rb
 ├── breadth_first_search.rb   #
-├── depth_first_search.rb   
+├── depth_first_search.rb     # refactoring done.
 ├── dijkstra_unsorted_array.rb
 ├── fibonacci_heap.rb
 ├── fibonacci_search.rb       #
