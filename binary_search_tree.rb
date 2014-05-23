@@ -41,6 +41,7 @@ class Node
     self.right_node = Node.new(next_node) if next_node 
     self
   end
+
 end
 
 module Traverse
@@ -125,6 +126,13 @@ class BinaryTree
     attr_accessor :root, :traverse_list
   end
 
+  Node.class_eval do 
+    alias :l :left_node
+    alias :r :right_node
+    alias :l= :left_node=
+    alias :r= :right_node=
+  end 
+
   def self.search value
     current = self.root
     parent ||= self.root
@@ -149,63 +157,44 @@ class BinaryTree
   def self.delete value
     node, parent = search value
     if node != self.root
-      if !node.left_node && !node.right_node
-          parent.left_node == node ? parent.left_node = nil : parent.right_node = nil
-      end
-
-      if !node.left_node && node.right_node
-        parent.left_node == node ? parent.left_node = node.right_node : parent.right_node = node.right_node 
-      end
-
-      if node.left_node && !node.right_node
-        parent.left_node == node ? parent.left_node = node.left_node : parent.right_node = node.left_node 
-      end
-
-      if node.left_node && node.right_node
-        pre = node
-        r_most_leaf = node.left_node
-        # because left subtree's right most node will point to node by inorder traversal
-        # so we have to find the rightmost node, and its predecessor.
-        # then mode rightmost node to node, then joint its subtree to predecessor's sub node.
-        while r_most_leaf.right_node
-          pre = r_most_leaf
-          r_most_leaf = r_most_leaf.right_node
+      if !node.l && !node.r
+          parent.l == node ? parent.l = nil : parent.r = nil
+      elsif node.l && node.r
+        prev, pred = self.get_prev_and_rmost node
+        if pred
+          # The rightmost node must not have right leaf, or it will not be rightmost node.
+          # move pred's left sub tree to predecessor's right
+          prev.r = pred.l
+          pred.r = node.r
+          pred.l = node.l  
+          parent.l == node ? parent.l = pred : parent.r = pred
+        else
+          parent.l == node ? parent.l = prev : parent.r = prev
         end
-        
-        tmp = r_most_leaf.left_node if r_most_leaf.left_node
-        r_most_leaf.left_node = node.left_node if node.left_node != r_most_leaf
-        r_most_leaf.right_node = node.right_node if node.right_node != r_most_leaf
-        parent.left_node == node ? parent.left_node = r_most_leaf : parent.right_node = r_most_leaf  
-        
-        #require 'pry'; binding.pry
-        # The rightmost node must not have right leaf, or it will not be rightmost node.
-        # move node's sub tree to predecessor left or right tree.
-        # if no rightmost sub node, then just joint left leaf to pre.
-        node == pre ? pre.left_node = tmp : pre.right_node = tmp
+      else
+        tmp = node.l || node.r
+        parent.l == node ? parent.l = tmp : parent.r = tmp
       end
-      node = nil
-
     elsif node == self.root
-      self.root = nil if !node.left_node && !node.right_node
-      self.root = node.right_node if !node.left_node && node.right_node 
-      self.root = node.left_node if node.left_node && !node.right_node
-      if node.left_node && node.right_node
-        pre = node
-        r_most_leaf = node.left_node
-        while r_most_leaf.right_node
-          pre = r_most_leaf
-          r_most_leaf = r_most_leaf.right_node
+      # refactor this part
+      self.root = nil if !node.l && !node.r
+      self.root = node.r if !node.l && node.r 
+      self.root = node.l if node.l && !node.r
+      if node.l && node.r
+        prev, pred = self.get_prev_and_rmost node
+        if pred
+          prev.r = pred.l
+          pred.l = node.l 
+          pred.r = node.r     
+          self.root = pred
+        else
+          self.root = prev
         end
-        tmp = r_most_leaf.left_node if r_most_leaf.left_node
-        r_most_leaf.left_node = node.left_node 
-        r_most_leaf.right_node = node.right_node 
-        node == pre ? pre.left_node = tmp : pre.right_node = tmp
-        self.root = r_most_leaf
       end
-      node = nil
     else 
       puts 'Nothing for deletion.'
     end
+    node = nil
   end
 
 # Binary search tree add, always compare from self.root
@@ -266,21 +255,20 @@ class BinaryTree
     self.traverse_list = []
     self.root = Node.new *args
   end
+
+private
+
+  def self.get_prev_and_rmost(node)
+    previous = node.l
+    r_most_leaf = previous.r
+    # because left subtree's right most node will point to node by inorder traversal
+    # so we have to find the rightmost node, and its predecessor.
+    # then mode rightmost node to node, then joint its subtree to predecessor's sub node.
+    while r_most_leaf && r_most_leaf.r
+      previous = r_most_leaf
+      r_most_leaf = r_most_leaf.r
+    end
+    return previous, r_most_leaf
+  end
 end
 
-# Main program
-
-#BinaryTree.create_tree(7)
-#BinaryTree.insert(8, 9, 2, 1, 5, 3, 6, 4)
-
-#BinaryTree.create_tree(10)
-#BinaryTree.insert(20, 39, 42, 45)
-#
-#
-#puts ""
-#BinaryTree.inorder(BinaryTree.root)
-#
-#BinaryTree.delete(10)
-#
-#
-#BinaryTree.morris_inorder_traversal nil

@@ -1,4 +1,5 @@
 require "spec_helper"
+require_relative "../binomial_heap"
 
 describe "BinomialHeap" do
   let(:x) { BinomialHeap.new 18 }

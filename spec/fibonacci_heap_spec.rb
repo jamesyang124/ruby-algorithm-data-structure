@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_relative "../fibonacci_heap"
 
 describe "FibonacciHeap" do
   it 'initialize new heap with 16' do 

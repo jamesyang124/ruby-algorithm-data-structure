@@ -11,9 +11,9 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 ├── avl_tree.rb
 ├── bellmen_ford.rb           # refactoring done.
 ├── binary_heap.rb
-├── binary_search_tree.rb     #
+├── binary_search_tree.rb     # refactoring done.
 ├── binomial_heap.rb
-├── breadth_first_search.rb   #
+├── breadth_first_search.rb   # refactoring done.
 ├── depth_first_search.rb     # refactoring done.
 ├── dijkstra_unsorted_array.rb
 ├── fibonacci_heap.rb

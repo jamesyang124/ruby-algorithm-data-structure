@@ -1,7 +1,4 @@
 # graph by adjacent list
-#           0         1    2          3          4    5          6          7       8
-source = [ [1, 2, 3], [0], [0, 6, 7], [0, 4, 5], [3], [3, 6, 8], [2, 5, 7], [2, 6], [5] ]
-
 # set visited first then push into Queue.
 # pop first-in then find unvisited adjacent vertices, then set them to visited and put it to queue
 # time complexity:  O(|V|+|E|)
@@ -33,6 +30,7 @@ class BFS
     puts sprintf("%-25s %s", "Queue: #{queue}", "Visited list: #{@visited}")
   end
 
+  # dequeue an element from queue, find all adjacent unvisited nodes and set them to visited, put to the queue.
   def bread_first_search(first)
     puts sprintf("%-25s %s", "Queue: [ bottom - top ]", "Visited list")
     enqueue(first)
@@ -54,5 +52,3 @@ class BFS
     p @T
   end
 end
-
-BFS.new(source).bread_first_search(0)

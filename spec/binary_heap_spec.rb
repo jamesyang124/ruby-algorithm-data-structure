@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_relative "../binary_heap"
 require 'pry'
 
 describe "BinaryHeap" do
