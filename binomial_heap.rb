@@ -11,13 +11,13 @@ class BinomialNode
   attr_accessor :degree, :sibling, :child, :parent, :key
 
   def initialize key
-    self.degree = 0
-    self.key = key
+    @degree = 0
+    @key = key
     #self.child = nil && self.sibling = nil && self.parent = nil
   end
 
   def < (node)
-    self.key < node.key
+    @key < node.key
   end
 end
 
@@ -149,7 +149,7 @@ private
 
   def remove_min_from_heap
     # remove @min from current heap
-    root = self.head 
+    root = @head 
     if root == @min
       @head = @min.sibling
     else
@@ -211,20 +211,21 @@ private
     current
   end
 
+  # nc => node's child
+  # ncs => node's child's sibling
   def search_key key
     node = self.head
-    
     while node
       return node if node.key == key
-      node_child = node.child    
-      while node_child
-        return node_child if node_child.key == key
-        node_child_sib = node_child.sibling
-        while node_child_sib 
-          return node_child_sib if node_child_sib.key == key
-          node_child_sib = node_child_sib.sibling
+      nc = node.child    
+      while nc
+        return nc if nc.key == key
+        ncs = nc.sibling
+        while ncs 
+          return ncs if ncs.key == key
+          ncs = ncs.sibling
         end
-        node_child = node_child.child
+        nc = nc.child
       end
       node = node.sibling
     end
@@ -245,7 +246,7 @@ private
       @head = hy_next
       hy_next = hy_next.sibling
     end
-    tail = self.head
+    tail = @head
 
     # recreate new root list for two heaps
     while hx_next && hy_next

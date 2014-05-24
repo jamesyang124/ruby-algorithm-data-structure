@@ -6,7 +6,7 @@
 # min heap usually use to implelemt priority queue. 
 # heap not support seach function, but provide sorting ability.
 
-container = [5, 6, 7, 8, 10, 11, 1, 2, 4, 3]
+#container = [5, 6, 7, 8, 10, 11, 1, 2, 4, 3]
 
 module HeapFunctions 
   attr_accessor :container 
@@ -108,11 +108,6 @@ class MaxHeap
   end
 
   def bottom_up_heapify
-    super "<"
+    super ">"
   end
 end
-
-#max_h = MaxHeap.new container
-#max_h.insert 100
-#max_h.insert 0
-#max_h.deletionp
