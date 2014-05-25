@@ -11,8 +11,7 @@ class SkipList
   attr_accessor :list
   
   def initialize(key)
-    @list = []
-    @list.push [SkipNode.new(key)]
+    @list ||= [].push [SkipNode.new(key)]
   end
 
   def insert(key)

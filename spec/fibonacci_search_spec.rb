@@ -10,12 +10,13 @@ describe "Fibonacci Search" do
     l, r, m = 0, ary.size-1, 0
 
     puts "ary: #{ary}"
+    index_ary = [y, l, r, m]
 
-    loc = main(13, y, l, r, m)
+    loc = main(ary, 13, index_ary)
     expect(ary[loc]).to equal 13
     puts ary[loc] == 13 ? "Value 13 at index #{loc}." : "Value cannot found."
 
-    loc = main(32, y, l, r, m)
+    loc = main(ary, 32, index_ary)
     expect(ary[loc]).to equal 32
     puts ary[loc] == 32 ? "Value 32 at index #{loc}." : "Value cannot found."
   end

@@ -16,15 +16,15 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 ├── breadth_first_search.rb   # refactoring done.
 ├── depth_first_search.rb     # refactoring done.
 ├── dijkstra_unsorted_array.rb
-├── fibonacci_heap.rb         #
-├── fibonacci_search.rb       #
+├── fibonacci_heap.rb         
+├── fibonacci_search.rb       # refactoring done.
 ├── floyd.rb
 ├── huffman_tree.rb           #
-├── interpolation_search.rb
+├── interpolation_search.rb   # refactoring done.
 ├── kruskal.rb                # refactoring done.
 ├── prim.rb                   # refactoring done.
 ├── red_black_tree.rb
-├── skip_list.rb
+├── skip_list.rb              # review done.
 ├── README.md
 ├── spec
 │   ├── 2_3_b_tree_spec.rb

@@ -17,7 +17,8 @@ def get_fib_number(n, first, second, counts)
   end
 end
 
-def main(input, y, l, r, m)
+def main(ary, input, index_ary)
+  y, l, r, m = *index_ary
   while (l <= r)
     m = l + $fib_ary[y-1] - 1   # reduce multiple or qutient time from binary or interpolation search
     if input == ary[m]
