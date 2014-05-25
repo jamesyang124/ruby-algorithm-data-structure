@@ -13,6 +13,11 @@ class FibonacciNode
   def < (node)
     self.key < node.key
   end
+
+  alias :r :right
+  alias :l :left
+  alias :l= :left=
+  alias :r= :right=
 end
 
 # http://staff.ustc.edu.cn/~csli/graduate/algorithms/book6/chap21.htm
@@ -35,9 +40,9 @@ class FibonacciHeap
 
   def get_min
     node = @min = root_head
-    while node 
+    while node
       @min = node if node.key < min.key
-      node = node.right
+      node = node.r
     end
     @min
   end
@@ -55,12 +60,12 @@ class FibonacciHeap
     else
       new_node = FibonacciNode.new key
       @root_tail = get_root_tail
-      @root_tail.right = new_node
-      new_node.left = @root_tail
+      @root_tail.r = new_node
+      new_node.l = @root_tail
       @root_tail = new_node
       self.min = new_node if min.key > new_node.key
     end
-    self.size += 1 
+    @size += 1 
   end
 
   # The change in potential is
@@ -73,8 +78,8 @@ class FibonacciHeap
     return heap_x if !heap_y.root_head
 
     y_head = heap_y.root_head
-    heap_x.root_tail.right = y_head
-    y_head.left = heap_x.root_tail
+    heap_x.root_tail.r = y_head
+    y_head.l = heap_x.root_tail
     heap_x.root_tail = heap_y.root_tail
     heap_x.min = heap_y.min if heap_x.min.key > heap_y.min.key
     heap_x.size = heap_x.size + heap_y.size 
@@ -86,33 +91,38 @@ class FibonacciHeap
   # = O(D(n)) + O(t(H)) - t(H)
   # = O(D(n)) ~= O(log n)
   def extract_min
-    prev = min.left
-    post = min.right 
+    prev = min.l
+    post = min.r 
     
     # concat children to root list
-    min_child_head = min_child_tail = min.child
-    if min_child_tail
-      while min_child_tail.right && min_child_tail.right.parent == min
-        min_child_tail = min_child_tail.right 
+    # min_child_head = min_child_tail = min.child
+    mch = mct = min.child
+    if mch
+      mch.parent = nil
+      # link prev to min's first child
+      # if prev = nil, then root_head == min so set root_head to next root. 
+      if prev
+        prev.right = mch 
+        mch.left = prev
+      else
+        @root_head = mch
       end
-    end
-    min_child_head.parent = nil if min_child_head
-    min_child_tail.parent = nil if min_child_tail
-
-    # link prev to min's first child
-    # if prev = nil, then root_head == min so set root_head to next root.
-    if prev
-      prev.right = min_child_head ? min_child_head : post   
-      min_child_head.left = prev if min_child_head
     else
-      @root_head = min_child_head ? min_child_head : root_head.right
-    end
+      # if prev = nil, then root_head == min so set root_head to next root.
+      prev ? prev.right = post : @root_head = root_head.right
+    end  
 
     # link post to min's rightmost child.
     # if post does not exist, child list have been linked to root list so do nothing.
-    if post
-      post.left = min_child_tail ? min_child_tail : prev
-      min_child_tail.right = post if min_child_tail
+    if mct
+      mct = mct.r while mct.r && mct.r.parent == min
+      mct.parent = nil
+      if post
+        post.left = mct
+        mct.right = post
+      end
+    else
+      post.left = prev if post
     end
 
     consolidate
