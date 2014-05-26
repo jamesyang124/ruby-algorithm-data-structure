@@ -10,6 +10,11 @@ class BinarySearchNode
     self.height = 1
     self.balance_factor = 0
   end
+
+  alias :l :left_node
+  alias :l= :left_node=
+  alias :r :right_node
+  alias :r= :right_node= 
 end
 
 class AvlTree
@@ -55,14 +60,14 @@ class AvlTree
     result = search_key key
     if result
       # no child or one child
-      if !result.left_node || !result.right_node
-        tmp = result.right_node ? result.right_node : result.left_node
+      if !result.l || !result.r
+        tmp = result.r ? result.r : result.l
         if result.parent
           tmp.parent = result.parent if tmp
-          if result.parent.left_node == result 
-            result.parent.left_node = tmp 
+          if result.parent.l == result 
+            result.parent.l = tmp 
           else
-            result.parent.right_node = tmp
+            result.parent.r = tmp
           end
           get_height result.parent
           get_balance_factor result.parent
@@ -72,52 +77,45 @@ class AvlTree
           tmp.parent = nil if tmp
         end
       else
-        # result has 2 children
-        # only 1 child for result's children, because AVL tree heights differ only at most 1, so suleaf's child has no children.
-        
-        successor = result.right_node
-        # find inorder successor, and replace, balance.
-        # successor at most 1 child. onlt in right, otherwise succesor will not be left-most node. 
-        while successor.left_node
-          successor = successor.left_node
-        end
-        suc_parent = successor.parent
+        # result HAS 2 CHILDREN
+        # only 1 child for result's children, because AVL tree heights differ only at most 1, so leaf's child has no children.
+              
+        # find inorder succ, and replace, then balance.  
+        # succ must be in subleaf becuase result has 2 children.
+        succ = find_succ result
+        suc_parent = succ.parent
         
         if parent = result.parent
-          if parent.left_node == result
-            parent.left_node = successor 
-          else
-            parent.right_node = successor 
-          end
+          parent.l == result ? parent.l = succ : parent.r = succ 
         else
-          @root = successor if parent == nil  
+          @root = succ if parent == nil  
         end
         
-        successor.left_node = result.left_node
-        successor.left_node.parent = successor 
+        succ.l, succ.l.parent = result.l, succ 
         
         if suc_parent != result
-          suc_parent.left_node = successor.right_node
-          successor.right_node = result.right_node
-        end        
+          suc_parent.l = succ.r
+          succ.r = result.r
+        end     
 
-        successor.right_node.parent = successor if successor.right_node
-        successor.parent = parent  
         
-        # find successor's parent's deepest then update it.
+        succ.r.parent = succ if succ.r
+        succ.parent = parent  
+        
+        # find succ's parent's deepest then update it.
         deepest_leaf = suc_parent
         while deepest_leaf
-          if deepest_leaf.left_node && deepest_leaf.right_node
-            if deepest_leaf.left_node.height > deepest_leaf.right_node.height
-              deepest_leaf = deepest_leaf.left_node
+          if deepest_leaf.l && deepest_leaf.r
+            if deepest_leaf.l.height > deepest_leaf.r.height
+              deepest_leaf = deepest_leaf.l
             else
-              deepest_leaf = deepest_leaf.right_node
+              deepest_leaf = deepest_leaf.r
             end
           else
-            if deepest_leaf.left_node
-              deepest_leaf = deepest_leaf.left_node
+            if deepest_leaf.l
+              deepest_leaf = deepest_leaf.l
             else
-              deepest_leaf.right_node ? deepest_leaf = deepest_leaf.right_node : break
+              deepest_leaf.r ? deepest_leaf = deepest_leaf.r : break
             end
           end
         end
@@ -139,19 +137,19 @@ class AvlTree
     child = node
     sub_tree = nil
     while parent
-      direction = parent.left_node == child ? 1 : -1
+      direction = parent.l == child ? 1 : -1
       if sub_tree
         if parent.balance_factor < -1
           if sub_tree == 1
-            RLrotate(parent, parent.right_node)
+            RLrotate(parent, parent.r)
           else
-            RRrotate(parent, parent.right_node)
+            RRrotate(parent, parent.r)
           end
         elsif parent.balance_factor > 1
           if sub_tree == 1
-            LLrotate(parent, parent.left_node)
+            LLrotate(parent, parent.l)
           else
-            LRrotate(parent, parent.left_node)
+            LRrotate(parent, parent.l)
           end
         end
       end
@@ -165,23 +163,23 @@ class AvlTree
     self.traverse_list.clear
     current = root
     while current
-      if current.left_node
-        pre = current.left_node
-        pre = pre.right_node while pre.right_node && pre.right_node != current
+      if current.l
+        pre = current.l
+        pre = pre.r while pre.r && pre.r != current
         # meet node which insert by traversal.
-        if pre.right_node
-          pre.right_node = nil
+        if pre.r
+          pre.r = nil
           visit current
           puts "current node #{current.key}, bf: #{current.balance_factor}, height: #{current.height}, parent: #{current.parent.key if current.parent} "
-          current = current.right_node
+          current = current.r
         else
-          pre.right_node = current
-          current = current.left_node
+          pre.r = current
+          current = current.l
         end
       else
         visit current
           puts "current node #{current.key}, bf: #{current.balance_factor}, height: #{current.height}, parent: #{current.parent.key if current.parent} "
-        current = current.right_node
+        current = current.r
       end
     end
     print_traversal_list
@@ -204,13 +202,13 @@ class AvlTree
 private
 
   def LLrotate(parent, child)
-    parent.left_node = child.right_node
-    child.right_node.parent = parent if child.right_node
-    child.right_node = parent
+    parent.l = child.r
+    child.r.parent = parent if child.r
+    child.r = parent
 
     child.parent = parent.parent
     if parent.parent
-      parent.parent.left_node == parent ? parent.parent.left_node = child : parent.parent.right_node = child
+      parent.parent.l == parent ? parent.parent.l = child : parent.parent.r = child
     else
       @root = child if parent == root
     end
@@ -228,17 +226,17 @@ private
   end
 
   def LRrotate(parent, child)
-    sub_right = child.right_node
+    sub_right = child.r
 
-    parent.left_node = sub_right.right_node
-    child.right_node = sub_right.left_node
-    sub_right.left_node = child
-    sub_right.right_node = parent
+    parent.l = sub_right.r
+    child.r = sub_right.l
+    sub_right.l = child
+    sub_right.r = parent
     
     sub_right.parent = parent.parent
     child.parent = sub_right
     if parent.parent
-      parent.parent.left_node == parent ? parent.parent.left_node = sub_right : parent.parent.right_node = sub_right  
+      parent.parent.l == parent ? parent.parent.l = sub_right : parent.parent.r = sub_right  
     else
       @root = sub_right if parent == root
     end
@@ -258,14 +256,14 @@ private
   end
 
   def RRrotate(parent, child)
-    parent.right_node = child.left_node
-    child.left_node.parent = parent if child.left_node
-    child.left_node = parent
+    parent.r = child.left_node
+    child.l.parent = parent if child.l
+    child.l = parent
 
     child.parent = parent.parent
     
     if parent.parent
-      parent.parent.left_node == parent ? parent.parent.left_node = child : parent.parent.right_node = child
+      parent.parent.l == parent ? parent.parent.l = child : parent.parent.r = child
     else
       @root = child if parent == root
     end
@@ -285,17 +283,17 @@ private
   def RLrotate(parent, child)
     #require 'pry'; binding.pry
     #puts "RL"
-    sub_left = child.left_node
+    sub_left = child.l
 
-    parent.right_node = sub_left.left_node
-    child.left_node = sub_left.right_node
-    sub_left.left_node = parent
-    sub_left.right_node = child
+    parent.r = sub_left.l
+    child.l = sub_left.r
+    sub_left.l = parent
+    sub_left.r = child
 
     sub_left.parent = parent.parent
     child.parent = sub_left
     if parent.parent
-      parent.parent.left_node == parent ? parent.parent.left_node = sub_left : parent.parent.right_node = sub_left
+      parent.parent.l == parent ? parent.parent.l = sub_left : parent.parent.r = sub_left
     else
       @root = sub_left if parent == root
     end
@@ -354,5 +352,21 @@ private
 
   def visit(node)
     self.traverse_list << node
+  end
+
+  def find_succ(node)
+    if node.r 
+      current = node.r
+      while current.l
+        current = current.l
+      end
+    else
+      current = node.p
+      while current && current.r == node
+        node = current
+        current = current.p
+      end
+    end
+    current
   end
 end

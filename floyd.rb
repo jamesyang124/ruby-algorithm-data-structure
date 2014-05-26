@@ -2,12 +2,12 @@
 
 # Big(O) = |V^3|
 
-path_matrix = []
+$path_matrix = []
 
-7.times { |_| path_matrix << [] }
+7.times { |_| $path_matrix << [] }
 
-path_matrix.each_index do |i|
-  7.times { |d| path_matrix[i] << d } 
+$path_matrix.each_index do |i|
+  7.times { |d| $path_matrix[i] << d } 
 end
 # [ [0, 1, 2, 3, .. 6]*7 ]
 
@@ -17,19 +17,8 @@ end
 # Floyd-Warshell algorithm can cmopute the negative cycle with directed graph.
 # if negative cycle exists, there is no way to find the correct routes from source to dest.
 
-adjacent = \
-[ 
-  [0, 1, 4, 5, nil, nil, nil], 
-  [1, 0, nil, 2, nil, nil, nil], 
-  [4, nil, 0, 4, nil, 3, nil], 
-  [5, 2, 4, 0, 5, 2, nil], 
-  [nil, nil, nil, 5, 0, nil, 6],
-  [nil, nil, 3, 2, nil, 0, 4], 
-  [nil, nil, nil, nil, 6, 4, 0]
-]
 
-V = adjacent.size
-max_weight = 0
+$max_weight = 0
  
 #adjacent.each do |a|
 #  none_nil = a.reject do |a|
@@ -58,27 +47,21 @@ def update_matrixs(adjacent, path, i, j, k)
   end
 end
 
-V.times do |i|  # => |V|
-  adjacent.each_index do |j|  # => |V|
-    adjacent.each_index do |k|  # => |V|
-      if adjacent[j][k]  
-        update_matrixs(adjacent, path_matrix, i, j, k) 
-      else
-        update_values(adjacent, path_matrix, i, j, k) if adjacent[j][i] and adjacent[i][k]
+def main adjacent, v
+  v.times do |i|  # => |V|
+    adjacent.each_index do |j|  # => |V|
+      adjacent.each_index do |k|  # => |V|
+        if adjacent[j][k]  
+          update_matrixs(adjacent, $path_matrix, i, j, k) 
+        else
+          update_values(adjacent, $path_matrix, i, j, k) if adjacent[j][i] and adjacent[i][k]
+        end
       end
     end
   end
 end
 
 #Compute whether there has a existence of negative cycle.
-V.times do |i|
-  puts "No correct answer, has negative cycle." if adjacent[i].sort.first < 0
-end
-
-puts "PATH_MATRIX:"
-path_matrix.each { |p|  p p }
-puts "ADJACENT_MATRIX:"
-adjacent.each { |a| p a }
 
 def routes(path_matrix, u, v)
   if path_matrix[u][v] != v
@@ -89,6 +72,4 @@ def routes(path_matrix, u, v)
   end
 end
 
-printf "%s \n", "FROM VERTEX #{ARGV[0].to_i}:"
-printf "%s ", "vertex #{ARGV[0].to_i} ->"
-routes(path_matrix, ARGV[0].to_i, ARGV[1].to_i)
+

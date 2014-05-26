@@ -6,7 +6,7 @@
 
 # adjacent_matrix, by array, Big-O is |V^2|
 
-adjacent_matrix = \
+$adjacent_matrix = \
 [ 
   [0, 1, 4, 5, nil, nil, nil], 
   [1, 0, nil, 2, nil, nil, nil], 
@@ -17,16 +17,16 @@ adjacent_matrix = \
   [nil, nil, nil, nil, 6, 4, 0]
 ]
 
-distance = []
-prior = []
-decided = []
+$distance = []
+$prior = []
+$decided = []
 
-adjacent_matrix.size.times { prior << 0 ; decided << 0 }
+$adjacent_matrix.size.times { $prior << 0 ; $decided << 0 }
 start_index = 0
 
 # set it start at Vertex 0, index 0 in adjacent_matrix
-distance = adjacent_matrix[start_index]
-decided[start_index] = 1
+$distance = $adjacent_matrix[start_index]
+$decided[start_index] = 1
 
 def undecided_result(decided)
   decided.each { |d| return true if d == 0}
@@ -75,10 +75,12 @@ def print_out(distance, prior, decided)
   puts sprintf "\t %-10s %s", "Decided:", " #{decided}"
 end
 
-while undecided_result(decided)    # =>  |V|
-  dest_index = get_min_index(distance, decided)
-  decided[dest_index] = 1
-  update_dist(dest_index, distance, decided, prior, adjacent_matrix) # => |V|
-  
-  print_out(distance, prior, decided)
+def main
+  while undecided_result($decided)    # =>  |V|
+    dest_index = get_min_index($distance, $decided)
+    $decided[dest_index] = 1
+    update_dist(dest_index, $distance, $decided, $prior, $adjacent_matrix) # => |V|
+    
+    print_out($distance, $prior, $decided)
+  end
 end

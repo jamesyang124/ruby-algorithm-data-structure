@@ -190,8 +190,8 @@ private
 
   def get_root_tail
     @root_tail = root_head
-    while root_tail.right
-      @root_tail = root_tail.right
+    while root_tail.r
+      @root_tail = root_tail.r
     end
     root_tail
   end
@@ -221,38 +221,32 @@ private
   end
 
   def merge_link(heap, sub, base)
-    sub.left.right = sub.right if sub.left
-    sub.right.left = sub.left if sub.right
+    sub.l.r = sub.r if sub.l
+    sub.r.l = sub.l if sub.r
 
-    sub.right = base.child
-    sub.left = nil
-    sub.mark = false
-    sub.parent = base
-    
-    sub_child, base_child = sub.child, base.child.child if base.child
+    sub.r, sub.l, sub.parent = base.child, nil, base
+    sub.mark = false    
+    sc, bcc = sub.child, base.child.child if base.child
 
     # link children starting from sub's first level child to base's second level child.
-    while sub_child && base_child
+    while sc && bcc
       # need parenthesis, x ||= 5 === x = x || 5 => || return none-nil value if possible
-      sub_child_next = sub_child_next.right while (sub_child_next ||= sub_child) && sub_child_next.right
-      
-      sub_child_next.right, base_child.left = base_child, sub_child_next
-      sub_child, base_child = sub_child.child, base_child.child
+      sc_next = sc_next.r while (sc_next ||= sc) && sc_next.r
+      sc_next.r, bcc.l = bcc, sc_next
+      sc, bcc = sc.child, bcc.child
     end
 
-    base.child.left = sub if base.child
+    base.child.l = sub if base.child
     base.child = sub
     base.degree += 1
 
-    # define root_head
+    # reset root_head
     if root_head == sub
-      find_root_head = base
-      find_root_head = find_root_head.left while find_root_head.left
-      @root_head = find_root_head
+      new_head = base
+      new_head = new_head.l while new_head.l
+      @root_head = new_head
     end
   end
-
-
 
   def cascading_cut(parent)
     ancestor = parent.parent
@@ -274,17 +268,17 @@ private
   # Because x might be the second child cut from its parent y since the time that y was linked to its children.
   # So #cascading_cut(parent) will perform recursively in #decrease_key.
   def cut(heap, node, parent)
-    if node.left
-      node.left.right = node.right ? node.right : nil
+    if node.l
+      node.l.r = node.r ? node.r : nil
     end
 
-    if node.right
-      node.right.left = node.left ? node.left : nil
+    if node.r
+      node.r.l = node.l ? node.l : nil
     end
     
     # if parent marked, set parent's child to nil, otherwise set it to left or right children in precednce if exist.
     if !parent.mark && parent.child == node
-      new_child = node.left || node.right
+      new_child = node.l || node.r
       parent.child = new_child && new_child.parent == parent ? new_child : nil
     end
     parent.child = nil if parent.mark
@@ -294,9 +288,9 @@ private
 
     root_parent = parent
     root_parent = root_parent.parent while root_parent.parent
-    node.left, node.right = root_parent.left, root_parent
-    root_parent.left.right = node if root_parent.left
-    root_parent.left = node
+    node.l, node.r = root_parent.l, root_parent
+    root_parent.l.r = node if root_parent.l
+    root_parent.l = node
     @root_head = node if @root_head == root_parent
   end 
 
@@ -304,15 +298,15 @@ private
     node = self.root_head
     while node
       return node if node.key == key
-      node_child = node.child    
-      while node_child 
-        return node_child if node_child.key == key
-        node_child_sib = node_child.right
-        while node_child_sib 
-          return node_child_sib if node_child_sib.key == key
-          node_child_sib = node_child_sib.right
+      nc = node.child    
+      while nc 
+        return nc if nc.key == key
+        nc_sib = nc.right
+        while nc_sib 
+          return nc_sib if nc_sib.key == key
+          nc_sib = nc_sib.right
         end
-        node_child = node_child.child
+        nc = nc.child
       end
       node = node.right
     end
