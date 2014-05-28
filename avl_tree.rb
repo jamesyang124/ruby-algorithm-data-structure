@@ -220,9 +220,6 @@ private
 
     get_balance_factor parent
     update_balance_factor parent
-    
-    #puts "LL"
-    #require 'pry'; binding.pry
   end
 
   def LRrotate(parent, child)
@@ -251,8 +248,6 @@ private
     get_balance_factor child
     update_balance_factor parent
    
-    #puts "LR"
-    #require 'pry'; binding.pry
   end
 
   def RRrotate(parent, child)
@@ -276,13 +271,9 @@ private
     get_balance_factor parent
     update_balance_factor parent
 
-    #puts "RR"
-    #require 'pry'; binding.pry
   end
 
   def RLrotate(parent, child)
-    #require 'pry'; binding.pry
-    #puts "RL"
     sub_left = child.l
 
     parent.r = sub_left.l

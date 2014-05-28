@@ -7,40 +7,49 @@ Comparison sorting algorithms are implemented with [Java version](https://github
 
 ```
 .
-├── 2_3_b_tree.rb             # refactoring done.
-├── avl_tree.rb               # review done.
-├── bellmen_ford.rb           # refactoring done.
-├── binary_heap.rb            # refactoring done.
-├── binary_search_tree.rb     # refactoring done.
-├── binomial_heap.rb          # review done.
-├── breadth_first_search.rb   # refactoring done.
-├── depth_first_search.rb     # refactoring done.
-├── dijkstra_unsorted_array.rb# review done.
-├── fibonacci_heap.rb         # review done.
-├── fibonacci_search.rb       # refactoring done.
-├── floyd.rb                  # review done.
-├── huffman_tree.rb           # review done.
-├── interpolation_search.rb   # refactoring done.
-├── kruskal.rb                # refactoring done.
-├── prim.rb                   # refactoring done.
-├── red_black_tree.rb
-├── skip_list.rb              # review done.
 ├── README.md
+├── 2_3_b_tree.rb
+├── avl_tree.rb
+├── bellmen_ford.rb
+├── binary_heap.rb
+├── binary_search_tree.rb
+├── binomial_heap.rb
+├── breadth_first_search.rb
+├── depth_first_search.rb
+├── dijkstra_unsorted_array.rb
+├── fibonacci_heap.rb
+├── fibonacci_search.rb
+├── floyd.rb
+├── huffman_tree.rb
+├── interpolation_search.rb
+├── kruskal.rb
+├── prim.rb
+├── red_black_tree.rb
+├── skip_list.rb
+├── splay_tree.rb
+├── topological_sort.rb
 ├── spec
 │   ├── 2_3_b_tree_spec.rb
 │   ├── avl_tree_spec.rb
+│   ├── bellmen_ford_spec.rb
 │   ├── binary_heap_spec.rb
+│   ├── binary_search_tree_spec.rb
 │   ├── binomial_heap_spec.rb
+│   ├── breadth_first_search_spec.rb
+│   ├── depth_first_search_spec.rb
+│   ├── dijkstra_unsorted_array_spec.rb
 │   ├── fibonacci_heap_spec.rb
+│   ├── fibonacci_search_spec.rb
+│   ├── floyd_spec.rb
 │   ├── huffman_tree_spec.rb
+│   ├── interpolation_search_spec.rb
+│   ├── kruskal_spec.rb
+│   ├── prim_spec.rb
 │   ├── red_blakc_tree_sepc.rb
 │   ├── skip_list_spec.rb
 │   ├── spec_helper.rb
 │   ├── splay_tree_spec.rb
 │   └── treap_spec.rb
-├── splay_tree.rb
-├── topological_sort.rb
 └── treap.rb
-
-1 directory, 34 files
+1 directory, 44 files
 ```
