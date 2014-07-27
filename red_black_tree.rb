@@ -15,6 +15,7 @@ class RBNode
   # In default, new node is colored as red.
   def initialize(key, color)
     @key = key
+    # node's color is parent link's color
     @color = color
   end
 end
