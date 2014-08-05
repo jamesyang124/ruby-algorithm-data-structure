@@ -20,6 +20,7 @@ def good_suffix_heuristic(pattern)
   i = pattern.size
   j = pattern.size + 1 
   f = []
+  # suffix shift array
   s = []
   j.times { |_| s << 0 }
 
@@ -29,12 +30,13 @@ def good_suffix_heuristic(pattern)
     while (j <= pattern.size && pattern[i-1] != pattern[j-1])
       s[j] = j - i if s[j] == 0
       j = f[j]
+      # puts "j now is: #{j}"
     end
     i -= 1
     j -= 1 
     f[i]=j
+    # puts "F[#{i}] now is: #{j}, #{s}"
   end
-
   # preprocess II
   j = 0
   j = f[0]
