@@ -2,6 +2,7 @@
 # http://www.ruanyifeng.com/blog/2013/05/boyer-moore_string_search_algorithm.html
 # http://www.geeksforgeeks.org/pattern-searching-set-7-boyer-moore-algorithm-bad-character-heuristic/
 # http://stackoverflow.com/questions/19345263/boyer-moore-good-suffix-heuristics
+# http://blog.jobbole.com/52830/
 
 # Search pattern whether in input string.
 
