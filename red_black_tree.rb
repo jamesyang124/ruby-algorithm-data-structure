@@ -6,6 +6,18 @@
  # 4. Every non-leaf node has same black count from it to each leaf by simple path. 
  # 5. Node's color is either red or black.
 
+ # Why data structure prefer rb tree than avl tree?
+ # The rotation in avl require logn times,
+ # In rb tree, it requires at most 3 for deletion, 2 for insertion.
+ # So fo each time balancing a tree => avl take logn times.
+ # => rb take (logn) in small number or amortized (1) for color changes plus rotations.
+ # http://en.wikipedia.org/wiki/Red%E2%80%93black_tree#Operations
+ # The AVL tree more rigid to maintain its balancing.
+ # The Red black tree more about its efficiency.
+ # http://discuss.fogcreek.com/joelonsoftware/?cmd=show&ixPost=22948
+ # Splay tree may get amortized (logn) and more adpat to input data.
+ # But its single insertion or deletion requires more than log(n) for small numbers.
+
 RED = 0
 BLACK = 1
 
